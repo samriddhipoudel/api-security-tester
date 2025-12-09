@@ -145,13 +145,13 @@ if __name__ == '__main__':
     print("="*60)
     print(f"👨‍💻 Developer: Samriddhi Poudel (23047345)")
     print(f"📅 Week 1: Foundation & Setup Phase")
-    print(f"🌐 Server: http://localhost:5000")
-    print(f"📊 API Docs: http://localhost:5000/api/info")
+    print(f"🌐 Server: http://localhost:8000")  # Changed to 8000
+    print(f"📊 API Docs: http://localhost:8000/api/info")  # Changed to 8000
     print("="*60)
     print("\n✅ Server starting...\n")
     
     app.run(
         host='0.0.0.0',
-        port=5000,
+        port=8000,  # Changed from 5000 to 8000
         debug=app.config['DEBUG']
     )
