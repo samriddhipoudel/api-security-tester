@@ -1,7 +1,7 @@
 """
 API Security Tester - Main Application
 Author: Samriddhi Poudel (23047345)
-Date: December 9, 2025
+Date: December 10, 2025
 """
 
 from flask import Flask, jsonify, request
@@ -9,6 +9,7 @@ from flask_cors import CORS
 from datetime import datetime
 from scanner import APIScanner
 from config import get_config
+from models import db, APIEndpoint, Scan, Vulnerability
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -19,17 +20,18 @@ app.config.from_object(get_config())
 # Enable CORS
 CORS(app)
 
-# Store scan history (temporary - will use database later)
-scan_history = []
+# Initialize database
+db.init_app(app)
 
 
 @app.route('/')
 def home():
     """Home endpoint"""
     return jsonify({
-        'message': 'API Security Tester - Running',
+        'message': 'API Security Tester - Running with Database',
         'version': app.config['VERSION'],
         'status': 'active',
+        'database': 'connected',
         'developer': 'Samriddhi Poudel (23047345)'
     })
 
@@ -43,11 +45,14 @@ def api_info():
         'status': 'running',
         'timestamp': datetime.now().isoformat(),
         'developer': 'Samriddhi Poudel (23047345)',
+        'database': 'MySQL connected',
         'features': [
             'Vulnerability Scanning',
             'HTTPS Enforcement Check',
             'Security Headers Analysis',
-            'HTTP Methods Testing'
+            'HTTP Methods Testing',
+            'Database Storage',
+            'Scan History'
         ]
     })
 
@@ -55,11 +60,74 @@ def api_info():
 @app.route('/api/health')
 def health_check():
     """Health check endpoint"""
+    try:
+        # Test database connection
+        from sqlalchemy import text
+        db.session.execute(text('SELECT 1'))
+        db_status = 'connected'
+    except Exception as e:
+        db_status = f'error: {str(e)}'
+    
     return jsonify({
         'status': 'healthy',
-        'timestamp': datetime.now().isoformat(),
-        'uptime': 'active'
+        'database': db_status,
+        'timestamp': datetime.now().isoformat()
     })
+
+
+@app.route('/api/endpoints', methods=['GET'])
+def get_endpoints():
+    """Get all saved API endpoints"""
+    try:
+        endpoints = APIEndpoint.query.all()
+        return jsonify({
+            'status': 'success',
+            'total': len(endpoints),
+            'endpoints': [ep.to_dict() for ep in endpoints]
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+
+@app.route('/api/endpoints', methods=['POST'])
+def save_endpoint():
+    """Save a new API endpoint"""
+    data = request.get_json()
+    
+    if not data or 'url' not in data:
+        return jsonify({
+            'error': 'URL is required',
+            'status': 'failed'
+        }), 400
+    
+    try:
+        endpoint = APIEndpoint(
+            name=data.get('name', 'Unnamed API'),
+            url=data['url'],
+            method=data.get('method', 'GET'),
+            headers=data.get('headers', ''),
+            body=data.get('body', ''),
+            description=data.get('description', '')
+        )
+        
+        db.session.add(endpoint)
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'API endpoint saved',
+            'endpoint': endpoint.to_dict()
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
 
 @app.route('/api/scan', methods=['POST'])
@@ -78,65 +146,101 @@ def scan_api():
     # Validate URL
     if not target_url.startswith(('http://', 'https://')):
         return jsonify({
-            'error': 'Invalid URL format. Must start with http:// or https://',
+            'error': 'Invalid URL format',
             'status': 'failed'
         }), 400
     
     try:
-        # Create scanner and run scan
-        scanner = APIScanner(target_url)
-        results = scanner.scan_api()
+        # Find or create endpoint
+        endpoint = APIEndpoint.query.filter_by(url=target_url).first()
+        if not endpoint:
+            endpoint = APIEndpoint(
+                name=data.get('name', 'Quick Scan'),
+                url=target_url,
+                method=data.get('method', 'GET')
+            )
+            db.session.add(endpoint)
+            db.session.commit()
         
-        # Add to history
-        scan_history.append(results)
+        # Run scanner
+        scanner = APIScanner(target_url)
+        scan_results = scanner.scan_api()
+        
+        # Create scan record
+        scan = Scan(
+            api_endpoint_id=endpoint.id,
+            total_tests=len(scan_results['tests']),
+            passed_tests=sum(1 for t in scan_results['tests'] if t['status'] == 'PASS'),
+            failed_tests=sum(1 for t in scan_results['tests'] if t['status'] == 'FAIL'),
+            warnings=sum(1 for t in scan_results['tests'] if t['status'] == 'WARNING')
+        )
+        db.session.add(scan)
+        db.session.commit()
+        
+        # Save vulnerabilities
+        for test in scan_results['tests']:
+            vuln = Vulnerability(
+                scan_id=scan.id,
+                test_name=test['name'],
+                category=test.get('category', 'General'),
+                severity=test['status'],
+                status=test['status'],
+                details=test['details']
+            )
+            db.session.add(vuln)
+        
+        db.session.commit()
         
         return jsonify({
             'status': 'success',
-            'message': 'Scan completed',
-            'results': results
+            'message': 'Scan completed and saved',
+            'scan_id': scan.id,
+            'results': scan_results
         })
         
     except Exception as e:
+        db.session.rollback()
         return jsonify({
             'error': str(e),
             'status': 'failed'
         }), 500
 
 
-@app.route('/api/history')
-def get_scan_history():
+@app.route('/api/scans')
+def get_scans():
     """Get scan history"""
-    return jsonify({
-        'status': 'success',
-        'total_scans': len(scan_history),
-        'scans': scan_history[-10:]  # Last 10 scans
-    })
+    try:
+        scans = Scan.query.order_by(Scan.scan_timestamp.desc()).limit(10).all()
+        return jsonify({
+            'status': 'success',
+            'total': len(scans),
+            'scans': [scan.to_dict() for scan in scans]
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
 
 @app.route('/api/stats')
 def get_stats():
     """Get application statistics"""
-    total_scans = len(scan_history)
-    
-    if total_scans == 0:
+    try:
+        total_scans = Scan.query.count()
+        total_endpoints = APIEndpoint.query.count()
+        total_vulnerabilities = Vulnerability.query.count()
+        
         return jsonify({
-            'total_scans': 0,
-            'message': 'No scans performed yet'
+            'total_scans': total_scans,
+            'total_endpoints': total_endpoints,
+            'total_vulnerabilities': total_vulnerabilities
         })
-    
-    # Calculate basic stats
-    total_tests = sum(len(scan['tests']) for scan in scan_history)
-    passed_tests = sum(
-        sum(1 for test in scan['tests'] if test['status'] == 'PASS')
-        for scan in scan_history
-    )
-    
-    return jsonify({
-        'total_scans': total_scans,
-        'total_tests': total_tests,
-        'passed_tests': passed_tests,
-        'pass_rate': f"{(passed_tests/total_tests*100):.1f}%" if total_tests > 0 else "0%"
-    })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
 
 if __name__ == '__main__':
@@ -145,13 +249,14 @@ if __name__ == '__main__':
     print("="*60)
     print(f"👨‍💻 Developer: Samriddhi Poudel (23047345)")
     print(f"📅 Week 1: Foundation & Setup Phase")
-    print(f"🌐 Server: http://localhost:8000")  # Changed to 8000
-    print(f"📊 API Docs: http://localhost:8000/api/info")  # Changed to 8000
+    print(f"🗄️  Database: MySQL Connected")
+    print(f"🌐 Server: http://localhost:8000")
+    print(f"📊 API Docs: http://localhost:8000/api/info")
     print("="*60)
     print("\n✅ Server starting...\n")
     
     app.run(
         host='0.0.0.0',
-        port=8000,  # Changed from 5000 to 8000
+        port=8000,
         debug=app.config['DEBUG']
     )
