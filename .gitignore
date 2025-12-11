@@ -1,0 +1,19 @@
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+backend/venv/
+
+# Mac files
+.DS_Store
+
+# Backup files
+*.save
+
+# Temporary folders
+Create/
+first/
+folder/

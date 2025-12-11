@@ -18,19 +18,12 @@ class Config:
     # Security Settings
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-key-change-in-production')
     
-    # Database Configuration
-    DB_HOST = os.getenv('DB_HOST', 'localhost')
-    DB_PORT = os.getenv('DB_PORT', '3306')
-    DB_NAME = os.getenv('DB_NAME', 'api_security_db')
-    DB_USER = os.getenv('DB_USER', 'root')
-    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
-    
-    # SQLAlchemy
-    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    # Database Configuration - UPDATED
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root123@localhost:3306/api_security_db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # API Scanner Settings
-    API_TIMEOUT = 10  # seconds
+    API_TIMEOUT = 10
     MAX_SCAN_THREADS = 5
     SCAN_RETRY_COUNT = 3
     
@@ -41,7 +34,7 @@ class Config:
     
     # Report Settings
     REPORT_OUTPUT_DIR = "reports/"
-    REPORT_FORMAT = "pdf"  # pdf, html, json
+    REPORT_FORMAT = "pdf"
     
     # Logging
     LOG_LEVEL = "INFO"
