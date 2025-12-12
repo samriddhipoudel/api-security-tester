@@ -26,7 +26,28 @@ db.init_app(app)
 
 @app.route('/')
 def home():
-    """Home endpoint"""
+    """Serve the main HTML page"""
+    from flask import send_from_directory
+    return send_from_directory('../frontend', 'index.html')
+
+
+@app.route('/css/<path:filename>')
+def serve_css(filename):
+    """Serve CSS files"""
+    from flask import send_from_directory
+    return send_from_directory('../frontend/css', filename)
+
+
+@app.route('/js/<path:filename>')
+def serve_js(filename):
+    """Serve JavaScript files"""
+    from flask import send_from_directory
+    return send_from_directory('../frontend/js', filename)
+
+
+@app.route('/api/')
+def api_home():
+    """API root - JSON response"""
     return jsonify({
         'message': 'API Security Tester - Running with Database',
         'version': app.config['VERSION'],
