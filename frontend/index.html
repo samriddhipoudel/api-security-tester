@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Security Tester | Samriddhi Poudel</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">🔒</span>
+                <h1>API Security Tester</h1>
+            </div>
+            <div class="header-info">
+                <span class="version">v0.1.0</span>
+                <span class="status" id="connectionStatus">
+                    <span class="status-dot"></span> Connecting...
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Hero Section -->
+            <section class="hero">
+                <h2>Automated API Vulnerability Scanner</h2>
+                <p>Test your APIs for common security vulnerabilities based on OWASP Top 10</p>
+            </section>
+
+            <!-- Scan Form -->
+            <section class="scan-section">
+                <div class="card">
+                    <h3>🔍 Scan API Endpoint</h3>
+                    <form id="scanForm">
+                        <div class="form-group">
+                            <label for="apiName">API Name (Optional)</label>
+                            <input 
+                                type="text" 
+                                id="apiName" 
+                                placeholder="e.g., GitHub API, Test API"
+                                class="form-input"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apiUrl">API URL *</label>
+                            <input 
+                                type="url" 
+                                id="apiUrl" 
+                                placeholder="https://api.example.com/endpoint"
+                                required
+                                class="form-input"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apiMethod">HTTP Method</label>
+                            <select id="apiMethod" class="form-select">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apiDescription">Description (Optional)</label>
+                            <textarea 
+                                id="apiDescription" 
+                                placeholder="Brief description of this API endpoint"
+                                class="form-textarea"
+                                rows="3"
+                            ></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="scanBtn">
+                                <span class="btn-icon">🚀</span>
+                                Start Security Scan
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="saveBtn">
+                                <span class="btn-icon">💾</span>
+                                Save Endpoint
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="loading-section" style="display: none;">
+                <div class="loader"></div>
+                <p>Scanning API endpoint...</p>
+                <p class="loading-subtext">Running security tests</p>
+            </div>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section" style="display: none;">
+                <div class="card">
+                    <div class="results-header">
+                        <h3>📊 Scan Results</h3>
+                        <button class="btn btn-small" id="clearResults">Clear</button>
+                    </div>
+
+                    <!-- Summary Stats -->
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalTests">0</div>
+                            <div class="stat-label">Total Tests</div>
+                        </div>
+                        <div class="stat-card stat-success">
+                            <div class="stat-value" id="passedTests">0</div>
+                            <div class="stat-label">Passed</div>
+                        </div>
+                        <div class="stat-card stat-danger">
+                            <div class="stat-value" id="failedTests">0</div>
+                            <div class="stat-label">Failed</div>
+                        </div>
+                        <div class="stat-card stat-warning">
+                            <div class="stat-value" id="warningTests">0</div>
+                            <div class="stat-label">Warnings</div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Results -->
+                    <div class="results-details" id="resultsDetails">
+                        <!-- Results will be inserted here by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Saved Endpoints Section -->
+            <section class="saved-section">
+                <div class="card">
+                    <div class="section-header">
+                        <h3>📚 Saved API Endpoints</h3>
+                        <button class="btn btn-small" id="refreshEndpoints">
+                            <span>🔄</span> Refresh
+                        </button>
+                    </div>
+                    <div id="savedEndpointsList" class="endpoints-list">
+                        <p class="empty-state">No saved endpoints yet</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Developed by <strong>Samriddhi Poudel</strong> (23047345)</p>
+            <p>Final Year Project 2025 | London Metropolitan University</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/app.js"></script>
+</body>
+</html>
