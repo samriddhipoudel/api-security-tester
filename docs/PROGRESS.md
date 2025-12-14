@@ -6,7 +6,7 @@
 
 ---
 
-## Week 1: Foundation & Setup (Dec 9-15, 2025)
+## Week 1: Foundation & Setup (Dec 9-13, 2025)
 
 ### Day 1 - Monday, December 9, 2025 ✅
 
@@ -140,7 +140,80 @@
   - Testing: 0.5 hours
   - Documentation: 0.5 hours
 
----
+  ---
+
+### Day 2 - Tuesday, December 10, 2025 ✅
+
+#### ✅ Completed Tasks
+- [x] Installed MySQL database (Homebrew)
+- [x] Configured MySQL with root password
+- [x] Designed complete database schema with 6 tables
+- [x] Created database/schema.sql with:
+  - users table (authentication)
+  - api_endpoints table (saved APIs)
+  - scans table (scan history)
+  - vulnerabilities table (test results)
+  - alerts table (notifications)
+  - scan_schedules table (automation)
+- [x] Created database/ERD_DESIGN.md documentation
+- [x] Created backend/models.py with SQLAlchemy ORM
+  - 6 model classes matching database tables
+  - Relationships and foreign keys configured
+  - to_dict() methods for JSON serialization
+- [x] Updated backend/config.py with MySQL connection string
+- [x] Enhanced backend/app.py with database integration
+- [x] Fixed SQLAlchemy text() query issue
+- [x] Tested all endpoints successfully
+- [x] Database connection verified
+
+#### 📊 Day 2 Statistics
+- **Total Commits:** 4
+- **New Files:** 3 (schema.sql, ERD_DESIGN.md, models.py)
+- **Updated Files:** 2 (config.py, app.py)
+- **Database Tables:** 6 created
+- **Lines of Code:** ~300+ new
+
+#### 🛠️ Technologies Used
+- MySQL 9.5.0 (Homebrew)
+- SQLAlchemy ORM
+- Flask-SQLAlchemy
+- PyMySQL (MySQL connector)
+
+#### 🐛 Challenges & Solutions
+| Challenge | Solution | Time Lost |
+|-----------|----------|-----------|
+| MySQL installation on Mac | Used Homebrew for clean install | 15 mins |
+| Root password authentication | Used mysql_secure_installation | 10 mins |
+| SQLAlchemy text() deprecation | Added explicit text() import | 5 mins |
+
+#### 💡 Key Learnings
+1. **Database Design**
+   - Entity-Relationship modeling
+   - Foreign key constraints
+   - One-to-Many relationships
+   - Index optimization
+
+2. **SQLAlchemy ORM**
+   - Model class creation
+   - Relationship definitions
+   - Session management
+   - Query building
+
+#### 🧪 Testing Results
+✅ MySQL installed and running  
+✅ Database `api_security_db` created  
+✅ All 6 tables created successfully  
+✅ Flask connects to database  
+✅ Health check shows "database: connected"  
+
+#### ⏱️ Time Breakdown
+- **Total Time:** 4 hours
+  - MySQL installation: 0.5 hours
+  - Database schema design: 1 hour
+  - Models.py creation: 1 hour
+  - App.py integration: 1 hour
+  - Testing: 0.5 hours
+
 
 ## 📊 Week 1 Progress Summary
 
