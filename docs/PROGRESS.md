@@ -8,7 +8,7 @@
 
 ## Week 1: Foundation & Setup (Dec 9-13, 2025)
 
-### Day 1 - Monday, December 9, 2025 ✅
+### Day 1 - Tuesday, December 9, 2025 ✅
 
 #### ✅ Completed Tasks
 - [x] GitHub repository initialized and cloned locally
@@ -110,7 +110,7 @@
 
 ---
 
-### Day 2 - Tuesday, December 10, 2025 ✅
+### Day 2 - Wednesday, December 10, 2025 ✅
 
 #### ✅ Completed Tasks
 - [x] Installed MySQL database (Homebrew)
@@ -217,7 +217,7 @@
 
 ---
 
-### Day 3 - Thursday, December 12, 2025 ✅
+### Day 3 - Friday, December 12, 2025 ✅
 
 #### ✅ Completed Tasks
 - [x] Created frontend/index.html with complete user interface
@@ -345,7 +345,7 @@
 
 ---
 
-### Day 4 - Friday, December 13, 2025 ✅
+### Day 4 - Saturday, December 13, 2025 ✅
 
 #### ✅ Completed Tasks
 - [x] Created frontend/js/app.js with complete JavaScript functionality (350+ lines)
