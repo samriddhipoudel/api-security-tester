@@ -101,7 +101,7 @@
   - Scanner enhancement: 1 hour
   - Flask API development: 1.5 hours
   - Testing & debugging: 0.5 hours
-  - Documentation: 0.5 hours (this log)
+  - Documentation: 0.5 hours
 
 #### 📝 Supervisor Updates
 - **Status:** On track
@@ -109,38 +109,6 @@
 - **Help Needed:** None currently
 
 ---
-
-### Day 2 - Tuesday, December 10, 2025 🚀
-
-#### 📅 Planned Tasks
-- [ ] Install MySQL or PostgreSQL database
-- [ ] Design database schema (ERD diagram)
-- [ ] Create database tables:
-  - `users` - User management
-  - `api_endpoints` - Saved API configurations
-  - `scan_results` - Scan history and results
-  - `vulnerabilities` - Detected vulnerabilities
-  - `alerts` - Alert notifications
-- [ ] Create models.py with SQLAlchemy ORM
-- [ ] Test database connection from Flask
-- [ ] Implement basic CRUD operations
-- [ ] Create database migrations
-
-#### 🎯 Goals for Day 2
-- Functional database connection
-- All tables created
-- Basic data insertion/retrieval working
-- 3-4 commits to GitHub
-
-#### ⏰ Estimated Time
-- **Total:** 3-4 hours
-  - Database installation: 0.5 hours
-  - Schema design: 1 hour
-  - Models creation: 1 hour
-  - Testing: 0.5 hours
-  - Documentation: 0.5 hours
-
-  ---
 
 ### Day 2 - Tuesday, December 10, 2025 ✅
 
@@ -161,7 +129,12 @@
   - Relationships and foreign keys configured
   - to_dict() methods for JSON serialization
 - [x] Updated backend/config.py with MySQL connection string
-- [x] Enhanced backend/app.py with database integration
+- [x] Enhanced backend/app.py with database integration:
+  - GET /api/endpoints - List saved APIs
+  - POST /api/endpoints - Save new API
+  - POST /api/scan - Scan with database storage
+  - GET /api/scans - Scan history
+  - GET /api/stats - Statistics from database
 - [x] Fixed SQLAlchemy text() query issue
 - [x] Tested all endpoints successfully
 - [x] Database connection verified
@@ -171,6 +144,7 @@
 - **New Files:** 3 (schema.sql, ERD_DESIGN.md, models.py)
 - **Updated Files:** 2 (config.py, app.py)
 - **Database Tables:** 6 created
+- **API Endpoints:** 8 total (2 new DB endpoints)
 - **Lines of Code:** ~300+ new
 
 #### 🛠️ Technologies Used
@@ -185,6 +159,7 @@
 | MySQL installation on Mac | Used Homebrew for clean install | 15 mins |
 | Root password authentication | Used mysql_secure_installation | 10 mins |
 | SQLAlchemy text() deprecation | Added explicit text() import | 5 mins |
+| Database folder was a file | Deleted file, created folder | 2 mins |
 
 #### 💡 Key Learnings
 1. **Database Design**
@@ -199,58 +174,46 @@
    - Session management
    - Query building
 
+3. **Database Integration**
+   - Flask-SQLAlchemy setup
+   - Database URI configuration
+   - Migration considerations
+   - Connection testing
+
+4. **MySQL Administration**
+   - Installation via Homebrew
+   - Service management
+   - User authentication
+   - Database creation
+
 #### 🧪 Testing Results
 ✅ MySQL installed and running  
 ✅ Database `api_security_db` created  
 ✅ All 6 tables created successfully  
 ✅ Flask connects to database  
 ✅ Health check shows "database: connected"  
+✅ Can save API endpoints to database  
+✅ Scan results saved to database  
+
+#### 📊 Database Schema
+#### 🎯 API Endpoints Added
+- `GET /api/endpoints` - List all saved APIs
+- `POST /api/endpoints` - Save new API configuration
+- `GET /api/scans` - Get scan history from database
+- `GET /api/stats` - Get statistics (counts)
 
 #### ⏱️ Time Breakdown
 - **Total Time:** 4 hours
-  - MySQL installation: 0.5 hours
+  - MySQL installation & setup: 0.5 hours
   - Database schema design: 1 hour
   - Models.py creation: 1 hour
-  - App.py integration: 1 hour
-  - Testing: 0.5 hours
+  - App.py database integration: 1 hour
+  - Testing & debugging: 0.5 hours
 
-
-## 📊 Week 1 Progress Summary
-
-**Days Completed:** 1/7  
-**Overall Progress:** 14% of Week 1  
-
-### Cumulative Stats
-- **Total Commits:** 6
-- **Total Files:** 4
-- **Total LOC:** 450+
-- **Total Time:** 3.5 hours
-
-### Next Milestones
-- ✅ Day 1: Foundation & Setup (Complete)
-- 🔄 Day 2: Database Design (In Progress)
-- ⏳ Day 3-4: Database Implementation
-- ⏳ Day 5: Frontend Basic UI
-- ⏳ Day 7: Week 1 Review & Documentation
-
----
-
-## 📞 Contact Log
-- **Last Update to Supervisors:** Dec 9, 2025 (Evening)
-- **Next Check-in:** Dec 10, 2025 (Evening)
-- **Weekly Meeting:** Friday, Dec 13, 2025
-
----
-
-**Notes:**
-- Project is on schedule ✅
-- No major blockers
-- Good momentum on Day 1
-- Ready for database implementation
-
----
-
-*Last Updated: December 10, 2025 - Morning*
+#### 📝 Supervisor Updates
+- **Status:** Ahead of schedule
+- **Blockers:** None
+- **Help Needed:** None
 
 ---
 
@@ -374,346 +337,173 @@
   - HTML structure: 1 hour
   - CSS styling: 1.5 hours
   - Flask routing: 0.5 hours
-  - Testing & refinement: 0.5 hours (done today)
 
 #### 📝 Supervisor Updates
 - **Status:** On schedule
 - **Blockers:** None
 - **Help Needed:** None
 
-#### 📸 Evidence
-- Frontend interface rendering successfully
-- Responsive design tested
-- All sections visible and styled
-- GitHub commit with frontend code
-
-#### Next Steps (Day 4 - Dec 13, Today!)
-- [ ] Create frontend/js/app.js
-- [ ] Implement API calls to backend
-- [ ] Connect scan form to backend
-- [ ] Display real scan results
-- [ ] Implement save endpoint functionality
-- [ ] Add error handling
-- [ ] Test end-to-end workflow
-
----
-
-### Day 4 - Friday, December 13, 2025 🚀
-
-#### 📅 Planned Tasks
-- [ ] Create app.js with all JavaScript functions
-- [ ] Implement fetch() API calls
-- [ ] Handle form submission
-- [ ] Display scan results dynamically
-- [ ] Load saved endpoints
-- [ ] Add error notifications
-- [ ] Test complete workflow (frontend → backend → database)
-- [ ] Take screenshots of working app
-
-#### 🎯 Goals for Day 4
-- Fully functional frontend-backend connection
-- Can scan APIs from browser
-- Results save to database
-- Can view scan history
-- 2-3 commits
-
----
-
-## 📊 Week 2 Progress Summary (Dec 9-13)
-
-**Days Completed:** 4/7  
-**Overall Progress:** 57% of Week 2  
-
-### Cumulative Stats
-- **Total Commits:** 11+
-- **Backend Files:** 4 (scanner.py, config.py, app.py, models.py)
-- **Frontend Files:** 2 (index.html, styles.css)
-- **Database Files:** 2 (schema.sql, ERD_DESIGN.md)
-- **Documentation:** 1 (PROGRESS.md)
-- **Total LOC:** ~1,350+
-- **Total Time:** 10.5 hours
-
-### Technology Stack Summary
-- **Backend:** Python, Flask, SQLAlchemy, PyMySQL
-- **Frontend:** HTML5, CSS3, JavaScript (in progress)
-- **Database:** MySQL 9.5.0
-- **Tools:** VS Code, Git, Homebrew, Postman
-
-### Features Completed
-✅ API vulnerability scanner  
-✅ Flask REST API with 8 endpoints  
-✅ MySQL database with 6 tables  
-✅ SQLAlchemy ORM models  
-✅ Beautiful responsive UI  
-⏳ JavaScript integration (today)  
-
----
-
-*Last Updated: December 13, 2025 - Morning*
-
 ---
 
 ### Day 4 - Friday, December 13, 2025 ✅
 
 #### ✅ Completed Tasks
-- [x] Created frontend/js/app.js with complete JavaScript functionality
-  - API connection checking
-  - Form validation and submission
-  - Asynchronous API calls using fetch()
-  - Real-time scan execution
-  - Dynamic results rendering
-  - Save endpoint functionality
-  - Load saved endpoints from database
-  - Error handling and notifications
-- [x] Implemented all frontend-backend API integrations:
-  - POST /api/scan - Trigger security scans
-  - POST /api/endpoints - Save API configurations
-  - GET /api/endpoints - Load saved endpoints
-  - GET /api/health - Check connection status
-- [x] Added notification system with animations
+- [x] Created frontend/js/app.js with complete JavaScript functionality (350+ lines)
+- [x] Implemented asynchronous API calls using fetch() and async/await
+- [x] Built dynamic DOM manipulation for real-time results display
+- [x] Added form validation and error handling
+- [x] Implemented notification system with animations
+- [x] Created functions for:
+  - checkConnection() - Backend health monitoring
+  - handleScan() - Execute security scans
+  - handleSaveEndpoint() - Save API configurations
+  - loadSavedEndpoints() - Fetch and display saved APIs
+  - displayResults() - Dynamic result rendering
+  - showNotification() - Toast notifications
 - [x] Tested complete end-to-end workflow
-- [x] Verified data persistence in MySQL database
-- [x] Took project screenshots for documentation
-- [x] Fixed Flask static file serving routes
+- [x] Verified frontend-backend-database integration
+- [x] Took 7 project screenshots for documentation
+- [x] Fixed Flask static file serving
+- [x] All API endpoints working correctly
 
 #### 📊 Day 4 Statistics
 - **Total Commits:** 2
 - **New Files:** 1 (app.js)
-- **Lines of JavaScript:** ~350+
+- **Lines of JavaScript:** 350+
 - **Functions Created:** 12
-- **API Integrations:** 4 endpoints
+- **API Integrations:** 4 endpoints connected
+- **Features Implemented:** 8
 - **Screenshots Taken:** 7
+- **Testing Time:** 1 hour
 
 #### 🎨 JavaScript Features Implemented
 
 **Core Functions:**
-- `checkConnection()` - Backend health check
-- `handleScan()` - Execute security scan
-- `handleSaveEndpoint()` - Save API to database
-- `loadSavedEndpoints()` - Fetch and display saved APIs
-- `displayResults()` - Render scan results dynamically
-- `showNotification()` - Toast notifications
-- `loadEndpointToForm()` - Populate form from saved data
+1. `checkConnection()` - Checks backend health on page load
+2. `setupEventListeners()` - Registers all event handlers
+3. `handleScan()` - Processes scan form submission
+4. `handleSaveEndpoint()` - Saves API to database
+5. `loadSavedEndpoints()` - Fetches saved APIs from backend
+6. `loadEndpointToForm()` - Populates form with saved data
+7. `displayResults()` - Renders scan results dynamically
+8. `clearResults()` - Clears result section
+9. `showLoading() / hideLoading()` - Loading state management
+10. `showResults() / hideResults()` - Result visibility control
+11. `showNotification()` - Toast notification system
 
 **UI State Management:**
-- Show/hide loading indicator
-- Show/hide results section
-- Enable/disable buttons during operations
+- Loading indicators during API calls
+- Button disable/enable during operations
 - Smooth scroll to results
-- Clear results functionality
+- Dynamic color-coded result items
+- Stats calculation and display
+- Empty state handling
 
 **Data Handling:**
 - JSON request/response parsing
-- Form data collection
-- URL validation
+- Form data collection and validation
+- URL format validation
 - Error handling for failed requests
-- Dynamic DOM manipulation
+- Dynamic HTML generation with template literals
 
 #### 🛠️ Technologies Used
-- JavaScript ES6+ (async/await, fetch API)
-- DOM Manipulation
-- Event Listeners
-- CSS Animations (dynamically added)
-- RESTful API consumption
-- JSON data format
+- **JavaScript ES6+** (async/await, arrow functions, template literals)
+- **Fetch API** (HTTP requests)
+- **DOM Manipulation** (getElementById, innerHTML, addEventListener)
+- **CSS Animations** (dynamically injected)
+- **Event Handling** (form submit, button clicks)
 
 #### 🧪 Testing Results
-✅ Form validation working  
-✅ Scan executes successfully  
-✅ Results display with correct colors  
-✅ Stats calculate correctly  
-✅ Save endpoint works  
-✅ Saved endpoints load and display  
-✅ Load to form functionality works  
-✅ Database stores all data  
-✅ Notifications appear and disappear  
-✅ No JavaScript errors in console  
-✅ Connection status updates correctly  
 
-#### 🎯 Complete Workflow Tested
+**End-to-End Test Case:**
+- ✅ Entered URL: https://api.github.com
+- ✅ Clicked "Start Security Scan"
+- ✅ Loading spinner displayed
+- ✅ Scan completed in 3 seconds
+- ✅ Results displayed with correct colors:
+  - ✅ Reachability: PASS (green)
+  - ✅ HTTPS: PASS (green)
+  - ⚠️ HTTP Methods: WARNING (yellow)
+  - ❌ Headers: FAIL (red)
+- ✅ Stats updated: 4 total, 2 passed, 1 failed, 1 warning
+- ✅ Saved endpoint to database
+- ✅ Endpoint appeared in saved list
+- ✅ "Load" button populated form correctly
+- ✅ No JavaScript errors in console
 
-**Test Case 1: Scan GitHub API**
-- URL: https://api.github.com
-- Method: GET
-- Results: ✅ 4 tests executed
-- Database: ✅ Scan saved
-- Vulnerabilities: ✅ All saved
+**API Endpoints Tested:**
+- ✅ POST /api/scan - Working
+- ✅ POST /api/endpoints - Working
+- ✅ GET /api/endpoints - Working
+- ✅ GET /api/health - Working
 
-**Test Case 2: Save Endpoint**
-- Endpoint saved to database ✅
-- Appears in saved list ✅
-- Can load back to form ✅
-
-**Test Case 3: End-to-End**
-- Frontend → Backend → Database → Response ✅
-- All data persists across page refresh ✅
+**Browser Compatibility:**
+- ✅ Chrome/Brave - Working perfectly
+- ⏳ Safari - Not tested yet
+- ⏳ Firefox - Not tested yet
 
 #### 💡 Key Learnings
 
-1. **Asynchronous JavaScript**
-   - Async/await syntax
-   - Promise handling
-   - Error catching in async functions
-   - Fetch API usage
+**1. Asynchronous JavaScript:**
+- Async/await makes code readable vs callback hell
+- Try-catch blocks handle promise rejections
+- Fetch API returns promises that need await
+- Must use async keyword on function to use await
 
-2. **DOM Manipulation**
-   - Dynamic content generation
-   - Template literals for HTML
-   - Event delegation
-   - Smooth scrolling
+**2. DOM Manipulation:**
+- Template literals (backticks) for clean HTML generation
+- innerHTML for quick updates (careful with XSS)
+- querySelector vs getElementById performance
+- Event delegation for dynamic elements
 
-3. **API Integration**
-   - RESTful API calls
-   - JSON serialization/deserialization
-   - CORS handling
-   - Request/response lifecycle
+**3. State Management:**
+- Show/hide patterns for UI elements
+- Disable buttons during operations (prevent double-submit)
+- Loading states improve UX
+- Clear feedback with notifications
 
-4. **User Experience**
-   - Loading states
-   - Error notifications
-   - Success feedback
-   - Form validation
-   - Smooth animations
+**4. API Integration:**
+- Content-Type header required for JSON
+- JSON.stringify() converts objects to strings
+- response.json() parses JSON from server
+- Error handling for network failures
+
+**5. Code Organization:**
+- Separate functions for each responsibility
+- Constants at top for easy configuration
+- Event listeners grouped in setup function
+- Helper functions at bottom
 
 #### 🎨 UI/UX Enhancements
-- Toast notifications with slide-in animation
-- Loading spinner during scans
+- Toast notifications slide in from right
+- Auto-dismiss after 3 seconds
+- Loading spinner with smooth animation
 - Disabled buttons during operations
-- Color-coded severity badges (PASS/FAIL/WARNING)
-- Smooth scroll to results
-- Empty state messages
-- Connection status indicator
+- Color-coded severity (green/yellow/red)
+- Smooth scroll to results section
+- Empty state messages for no data
+- Connection status indicator with pulse animation
 
-#### 🐛 Issues Fixed
+#### 🐛 Issues Fixed Today
 - Flask static file routing for JS files
-- CORS configuration
-- Database text() query warning
-- Form submission preventDefault
-- Notification auto-dismiss timing
+- Form preventDefault to stop page reload
+- Notification z-index for proper stacking
+- Result item color classes matching status
+- API URL validation before submission
 
-#### ⏱️ Time Breakdown
-- **Total Time:** 3.5 hours
-  - JavaScript coding: 2 hours
-  - Testing & debugging: 1 hour
-  - Screenshots & documentation: 0.5 hours
+#### 🎯 Complete Workflow Verified
 
-#### 📸 Screenshots Taken
-1. Initial page load (clean state)
-2. Form filled with test data
-3. Loading state during scan
-4. Complete scan results
-5. Saved endpoint display
-6. Browser console (no errors)
-7. Database verification
+**User Flow:**
+1. User opens http://127.0.0.1:8000 ✅
+2. Sees "Connected" status (green) ✅
+3. Fills form with API details ✅
+4. Clicks "Start Security Scan" ✅
+5. Loading spinner appears ✅
+6. Results display after 3-5 seconds ✅
+7. Stats show test summary ✅
+8. Each test has color badge ✅
+9. Can save endpoint ✅
+10. Saved endpoint appears in list ✅
+11. Can load endpoint back to form ✅
 
-#### 📝 Supervisor Updates
-- **Status:** Ahead of schedule
-- **Blockers:** None
-- **Milestone:** Complete working prototype achieved!
-
-#### 🎉 Major Achievement
-**COMPLETE FUNCTIONAL PROTOTYPE DELIVERED!**
-- ✅ Full-stack application working
-- ✅ Frontend-Backend-Database integration
-- ✅ Real security testing functional
-- ✅ Data persistence working
-- ✅ Professional UI/UX
-
-#### Next Steps (Week 2 - Dec 16-20)
-- [ ] Add more security tests (authentication, authorization)
-- [ ] Implement report generation (PDF)
-- [ ] Add scheduled scanning
-- [ ] Enhance dashboard with charts
-- [ ] Add user authentication
-- [ ] Improve error handling
-
----
-
-## 📊 Week 1 Complete Summary
-
-**Days Completed:** 4/5 working days  
-**Overall Progress:** 80% of Week 1 goals exceeded!
-
-### Cumulative Stats
-- **Total Commits:** 13+
-- **Total Files:** 8
-  - Backend: 4 files (scanner.py, config.py, app.py, models.py)
-  - Frontend: 3 files (index.html, styles.css, app.js)
-  - Database: 2 files (schema.sql, ERD_DESIGN.md)
-  - Docs: 1 file (PROGRESS.md)
-- **Total Lines of Code:** ~1,700+
-- **Total Time:** 14 hours
-- **API Endpoints:** 8 functional
-- **Database Tables:** 6 created
-- **Security Tests:** 4 implemented
-
-### Technology Stack (Complete)
-- **Backend:** Python 3, Flask, SQLAlchemy, PyMySQL
-- **Frontend:** HTML5, CSS3, JavaScript ES6+
-- **Database:** MySQL 9.5.0
-- **Tools:** VS Code, Git/GitHub, Homebrew, Postman
-
-### Major Milestones Achieved
-✅ Project structure created  
-✅ API scanner engine built  
-✅ Flask REST API developed  
-✅ MySQL database integrated  
-✅ Beautiful responsive UI  
-✅ Complete JavaScript functionality  
-✅ End-to-end testing successful  
-✅ **WORKING PROTOTYPE DELIVERED!**
-
-### Comparison to Plan
-**Planned for Week 1:** Foundation & Setup  
-**Actually Delivered:** Complete working application!
-
-**Original Week 1 Goals:**
-- ✅ Setup environment
-- ✅ Create backend structure
-- ✅ Database design
-- ✅ Basic UI
-
-**Bonus Achievements:**
-- ✅ Full frontend-backend integration
-- ✅ Real security scanning
-- ✅ Data persistence
-- ✅ Professional UI with animations
-
-#### 🎓 Lessons Learned - Week 1
-
-**Technical Lessons:**
-1. Always check port availability before deployment
-2. Database relationships save time later
-3. Plan UI before coding (saves rework)
-4. Git commits should be frequent and meaningful
-5. Testing early prevents integration issues
-
-**Project Management Lessons:**
-1. Breaking work into days helps track progress
-2. Documentation as you go is easier than later
-3. Setting realistic daily goals maintains motivation
-4. Having a clear plan reduces decision fatigue
-5. Celebrating small wins maintains momentum
-
-**Personal Growth:**
-1. Can learn new technologies quickly
-2. Problem-solving skills improved
-3. Time estimation getting better
-4. Confidence in full-stack development increased
-5. Communication through documentation improved
----
-
-## 🎯 Next Week Preview (Week 2)
-
-### Week 2 Goals (Dec 16-20)
-1. Add 4-6 more security tests (OWASP Top 10)
-2. Implement PDF report generation
-3. Add real-time monitoring dashboard
-4. Create scheduled scanning
-5. Build alert notification system
-6. Add data visualization charts
-
----
-
-*Last Updated: December 13, 2025 - Evening*  
-*Status: Week 1 COMPLETED with bonus features! 🎉*
+**Data Flow:**
