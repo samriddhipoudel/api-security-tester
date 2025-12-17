@@ -36,6 +36,9 @@ class APIScanner:
         self.test_response_headers()
         self.test_broken_authentication()
         self.test_sql_injection()
+        self.test_xss_vulnerability()  
+        self.test_rate_limiting()  
+        self.test_rate_limiting() 
 
         self.display_summary()
         return self.results
@@ -132,11 +135,11 @@ class APIScanner:
             if missing:
                 status = "FAIL"
                 details = f"Missing headers: {', '.join(missing)}"
-                print(f"❌ FAIL")
+                print("❌ FAIL")
             else:
                 status = "PASS"
                 details = "All security headers present"
-                print(f"✅ PASS")
+                print("✅ PASS")
 
             self.results['tests'].append({
                 'name': test_name,
@@ -158,7 +161,6 @@ class APIScanner:
 
         try:
             response_no_auth = requests.get(self.api_url, timeout=self.timeout)
-
             headers_invalid = {'Authorization': 'Bearer invalid'}
             response_invalid = requests.get(self.api_url, headers=headers_invalid, timeout=self.timeout)
 
@@ -190,7 +192,6 @@ class APIScanner:
             print(f"⚠️ ERROR - {e}")
 
     def test_sql_injection(self):
-        """Test 6: SQL Injection Detection"""
         test_name = "SQL Injection Vulnerability"
         print(f"[TEST 6] {test_name}...", end=" ")
 
@@ -201,9 +202,9 @@ class APIScanner:
             "admin'--"
         ]
 
-        vulnerable = False
-
         try:
+            vulnerable = False
+
             for payload in payloads:
                 test_url = f"{self.api_url}?id={payload}"
                 response = requests.get(test_url, timeout=self.timeout)
@@ -213,12 +214,8 @@ class APIScanner:
                     vulnerable = True
                     break
 
-            if vulnerable:
-                status = "FAIL"
-                details = "Possible SQL injection detected"
-            else:
-                status = "PASS"
-                details = "No SQL injection detected"
+            status = "FAIL" if vulnerable else "PASS"
+            details = "Possible SQL injection detected" if vulnerable else "No SQL injection detected"
 
             self.results['tests'].append({
                 'name': test_name,
@@ -226,8 +223,7 @@ class APIScanner:
                 'details': details
             })
 
-            icon = "❌" if status == "FAIL" else "✅"
-            print(f"{icon} {status}")
+            print(("❌" if vulnerable else "✅"), status)
 
         except Exception as e:
             self.results['tests'].append({
@@ -236,6 +232,105 @@ class APIScanner:
                 'details': str(e)
             })
             print(f"⚠️ ERROR - {e}")
+
+    def test_xss_vulnerability(self):
+        test_name = "XSS Vulnerability"
+        print(f"[TEST 7] {test_name}...", end=" ")
+
+        payloads = [
+            "<script>alert('XSS')</script>",
+            "<img src=x onerror=alert('XSS')>",
+            "<svg onload=alert('XSS')>"
+        ]
+
+        try:
+            vulnerable = False
+
+            for payload in payloads:
+                test_url = f"{self.api_url}?input={payload}"
+                response = requests.get(test_url, timeout=self.timeout)
+
+                if payload.lower() in response.text.lower():
+                    vulnerable = True
+                    break
+
+            status = "FAIL" if vulnerable else "PASS"
+            details = "XSS vulnerability detected" if vulnerable else "No XSS detected"
+
+            self.results['tests'].append({
+                'name': test_name,
+                'status': status,
+                'details': details
+            })
+
+            print(("❌" if vulnerable else "✅"), status)
+
+        except Exception as e:
+            self.results['tests'].append({
+                'name': test_name,
+                'status': 'ERROR',
+                'details': str(e)
+            })
+            print(f"⚠️ ERROR - {e}")
+
+    def test_rate_limiting(self):
+        """Test 8: Rate Limiting Check"""
+        test_name = "Rate Limiting"
+        print(f"[TEST 8] {test_name}...", end=" ")
+        
+        try:
+            # Send multiple rapid requests
+            request_count = 20
+            rate_limited = False
+            status_codes = []
+            
+            print(f"\n   └─ Sending {request_count} rapid requests...", end=" ")
+            
+            for i in range(request_count):
+                try:
+                    response = requests.get(self.api_url, timeout=self.timeout)
+                    status_codes.append(response.status_code)
+                    
+                    # Check for rate limiting responses
+                    if response.status_code == 429:  # Too Many Requests
+                        rate_limited = True
+                        break
+                    
+                    # Some APIs use 503 for rate limiting
+                    if response.status_code == 503:
+                        if 'rate' in response.text.lower() or 'limit' in response.text.lower():
+                            rate_limited = True
+                            break
+                    
+                except requests.exceptions.RequestException:
+                    break
+            
+            if rate_limited:
+                status = 'PASS'
+                details = f'Rate limiting detected (received 429/503 after {len(status_codes)} requests)'
+            else:
+                status = 'WARNING'
+                details = f'No rate limiting detected - sent {len(status_codes)} requests without restriction'
+            
+            self.results['tests'].append({
+                'name': test_name,
+                'status': status,
+                'details': details,
+                'category': 'Rate Limiting'
+            })
+            
+            icon = '✅' if status == 'PASS' else '⚠️'
+            print(f"\r   └─ Tested with {len(status_codes)} requests")
+            print(f"[TEST 8] {test_name}... {icon} {status}")
+            
+        except Exception as e:
+            self.results['tests'].append({
+                'name': test_name,
+                'status': 'ERROR',
+                'details': f'Test error: {str(e)}',
+                'category': 'Rate Limiting'
+            })
+            print(f"\r⚠️ ERROR - {str(e)}")
 
     def display_summary(self):
         print(f"\n{'=' * 50}")
@@ -271,5 +366,3 @@ def main():
 
 if __name__ == "__main__":
     main()
- 
- 
