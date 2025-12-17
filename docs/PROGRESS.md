@@ -858,5 +858,77 @@ Add 4-6 more security tests to expand vulnerability detection capabilities (OWAS
 
 ---
 
-*Last Updated: December 16, 2025 - Evening*  
-*Status: Week 2 Day 1 complete - 6 security tests working! 🚀*
+---
+
+### Day 2 - Wednesday, December 17, 2025 ✅
+
+#### ✅ Completed Tasks
+- [x] Added Test 7: XSS (Cross-Site Scripting) Detection
+  - Tests 5 common XSS payloads
+  - Checks for reflected payloads in responses
+  - Detects unsanitized script tags and event handlers
+  - Validates output encoding
+- [x] Added Test 8: Rate Limiting Check
+  - Sends 20 rapid requests to API
+  - Detects 429 (Too Many Requests) responses
+  - Checks for rate limiting headers
+  - Validates API throttling implementation
+- [x] Updated scanner.py to run 8 tests (33% increase from yesterday!)
+- [x] Tested all 8 tests with GitHub API
+- [x] Verified Flask integration working
+- [x] All tests executing correctly
+
+#### 📊 Day 2 Statistics
+- **Total Commits:** 1
+- **New Functions:** 2 (test_xss_vulnerability, test_rate_limiting)
+- **Lines of Code:** ~120+ added
+- **Total Tests:** 8 (was 6, now 8 - 33% increase!)
+- **Time:** 2 hours
+
+#### 🛠️ Technologies Used
+- XSS payload testing
+- Rate limiting detection
+- HTTP status code analysis
+- Rapid request testing
+
+#### 💡 Key Learnings
+1. **XSS Detection:**
+   - Different XSS payload types
+   - Reflected vs stored XSS
+   - Output sanitization importance
+   - Pattern matching for dangerous tags
+
+2. **Rate Limiting:**
+   - 429 status code for rate limits
+   - Burst request testing
+   - API throttling mechanisms
+   - Distinguishing between rate limits and server errors
+
+#### 🧪 Testing Results
+✅ Test 7 (XSS) working correctly  
+✅ Test 8 (Rate Limiting) detecting properly  
+✅ GitHub API shows 8 tests in results  
+✅ Performance good (~8 seconds for full scan)  
+✅ All previous tests still working  
+
+#### ⏱️ Time Breakdown
+- **Total Time:** 2 hours
+  - XSS test coding: 1 hour
+  - Rate limiting test coding: 0.75 hours
+  - Testing & debugging: 0.25 hours
+
+#### 📝 Supervisor Updates
+- **Status:** Week 2 Day 2 complete successfully
+- **Blockers:** None
+- **Progress:** 4/6 new tests complete (67% of Week 2 goal)
+
+#### Next Steps (Day 3 - Dec 18, Thursday)
+- [ ] Add Test 9: Excessive Data Exposure
+- [ ] Add Test 10: SSRF Detection
+- [ ] Test with multiple APIs
+- [ ] Complete Week 2 coding
+- [ ] Update documentation
+
+---
+
+*Last Updated: December 17, 2025 - Evening*
