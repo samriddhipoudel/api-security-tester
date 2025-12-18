@@ -17,13 +17,13 @@ class APIScanner:
         self.api_url = api_url
         self.timeout = timeout
         self.results = {
-            'url': api_url,
-            'timestamp': datetime.now().isoformat(),
-            'tests': []
+            "url": api_url,
+            "timestamp": datetime.now().isoformat(),
+            "tests": []
         }
 
     def scan_api(self):
-        """Main scanning function runs all security tests"""
+        """Run all security tests"""
         print(f"\n{'=' * 50}")
         print("🔒 API Security Scan Started")
         print(f"{'=' * 50}")
@@ -36,9 +36,10 @@ class APIScanner:
         self.test_response_headers()
         self.test_broken_authentication()
         self.test_sql_injection()
-        self.test_xss_vulnerability()  
-        self.test_rate_limiting()  
-        self.test_rate_limiting() 
+        self.test_xss_vulnerability()
+        self.test_rate_limiting()
+        self.test_excessive_data_exposure()
+        self.test_ssrf_vulnerability()
 
         self.display_summary()
         return self.results
@@ -52,18 +53,18 @@ class APIScanner:
             status = "PASS" if response.status_code == 200 else "WARNING"
             details = f"Status Code: {response.status_code}"
 
-            self.results['tests'].append({
-                'name': test_name,
-                'status': status,
-                'details': details
+            self.results["tests"].append({
+                "name": test_name,
+                "status": status,
+                "details": details
             })
             print(f"✅ {status} - {details}")
 
         except requests.exceptions.RequestException as e:
-            self.results['tests'].append({
-                'name': test_name,
-                'status': 'FAIL',
-                'details': str(e)
+            self.results["tests"].append({
+                "name": test_name,
+                "status": "FAIL",
+                "details": str(e)
             })
             print(f"❌ FAIL - {e}")
 
@@ -80,17 +81,17 @@ class APIScanner:
             details = "HTTP detected"
             print("❌ FAIL - Insecure HTTP")
 
-        self.results['tests'].append({
-            'name': test_name,
-            'status': status,
-            'details': details
+        self.results["tests"].append({
+            "name": test_name,
+            "status": status,
+            "details": details
         })
 
     def test_http_methods(self):
         test_name = "HTTP Methods Check"
         print(f"[TEST 3] {test_name}...", end=" ")
 
-        methods = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+        methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
         allowed_methods = []
 
         try:
@@ -102,18 +103,18 @@ class APIScanner:
             status = "WARNING" if "DELETE" in allowed_methods else "PASS"
             details = f"Allowed methods: {', '.join(allowed_methods)}"
 
-            self.results['tests'].append({
-                'name': test_name,
-                'status': status,
-                'details': details
+            self.results["tests"].append({
+                "name": test_name,
+                "status": status,
+                "details": details
             })
             print(f"⚠️ {status} - {details}")
 
         except Exception as e:
-            self.results['tests'].append({
-                'name': test_name,
-                'status': 'ERROR',
-                'details': str(e)
+            self.results["tests"].append({
+                "name": test_name,
+                "status": "ERROR",
+                "details": str(e)
             })
             print(f"⚠️ ERROR - {e}")
 
@@ -122,10 +123,10 @@ class APIScanner:
         print(f"[TEST 4] {test_name}...", end=" ")
 
         headers_to_check = [
-            'X-Frame-Options',
-            'X-Content-Type-Options',
-            'Strict-Transport-Security',
-            'Content-Security-Policy'
+            "X-Frame-Options",
+            "X-Content-Type-Options",
+            "Strict-Transport-Security",
+            "Content-Security-Policy"
         ]
 
         try:
@@ -141,17 +142,17 @@ class APIScanner:
                 details = "All security headers present"
                 print("✅ PASS")
 
-            self.results['tests'].append({
-                'name': test_name,
-                'status': status,
-                'details': details
+            self.results["tests"].append({
+                "name": test_name,
+                "status": status,
+                "details": details
             })
 
         except Exception as e:
-            self.results['tests'].append({
-                'name': test_name,
-                'status': 'ERROR',
-                'details': str(e)
+            self.results["tests"].append({
+                "name": test_name,
+                "status": "ERROR",
+                "details": str(e)
             })
             print(f"⚠️ ERROR - {e}")
 
@@ -161,8 +162,10 @@ class APIScanner:
 
         try:
             response_no_auth = requests.get(self.api_url, timeout=self.timeout)
-            headers_invalid = {'Authorization': 'Bearer invalid'}
-            response_invalid = requests.get(self.api_url, headers=headers_invalid, timeout=self.timeout)
+            headers_invalid = {"Authorization": "Bearer invalid"}
+            response_invalid = requests.get(
+                self.api_url, headers=headers_invalid, timeout=self.timeout
+            )
 
             if response_no_auth.status_code == 200:
                 status = "WARNING"
@@ -174,20 +177,20 @@ class APIScanner:
                 status = "PASS"
                 details = "Authentication enforced"
 
-            self.results['tests'].append({
-                'name': test_name,
-                'status': status,
-                'details': details
+            self.results["tests"].append({
+                "name": test_name,
+                "status": status,
+                "details": details
             })
 
             icon = "✅" if status == "PASS" else "❌" if status == "FAIL" else "⚠️"
             print(f"{icon} {status}")
 
         except Exception as e:
-            self.results['tests'].append({
-                'name': test_name,
-                'status': 'ERROR',
-                'details': str(e)
+            self.results["tests"].append({
+                "name": test_name,
+                "status": "ERROR",
+                "details": str(e)
             })
             print(f"⚠️ ERROR - {e}")
 
@@ -210,26 +213,30 @@ class APIScanner:
                 response = requests.get(test_url, timeout=self.timeout)
                 text = response.text.lower()
 
-                if any(err in text for err in ['sql', 'mysql', 'syntax error', 'sqlite']):
+                if any(err in text for err in ["sql", "mysql", "syntax error", "sqlite"]):
                     vulnerable = True
                     break
 
             status = "FAIL" if vulnerable else "PASS"
-            details = "Possible SQL injection detected" if vulnerable else "No SQL injection detected"
+            details = (
+                "Possible SQL injection detected"
+                if vulnerable else
+                "No SQL injection detected"
+            )
 
-            self.results['tests'].append({
-                'name': test_name,
-                'status': status,
-                'details': details
+            self.results["tests"].append({
+                "name": test_name,
+                "status": status,
+                "details": details
             })
 
             print(("❌" if vulnerable else "✅"), status)
 
         except Exception as e:
-            self.results['tests'].append({
-                'name': test_name,
-                'status': 'ERROR',
-                'details': str(e)
+            self.results["tests"].append({
+                "name": test_name,
+                "status": "ERROR",
+                "details": str(e)
             })
             print(f"⚠️ ERROR - {e}")
 
@@ -257,90 +264,150 @@ class APIScanner:
             status = "FAIL" if vulnerable else "PASS"
             details = "XSS vulnerability detected" if vulnerable else "No XSS detected"
 
-            self.results['tests'].append({
-                'name': test_name,
-                'status': status,
-                'details': details
+            self.results["tests"].append({
+                "name": test_name,
+                "status": status,
+                "details": details
             })
 
             print(("❌" if vulnerable else "✅"), status)
 
         except Exception as e:
-            self.results['tests'].append({
-                'name': test_name,
-                'status': 'ERROR',
-                'details': str(e)
+            self.results["tests"].append({
+                "name": test_name,
+                "status": "ERROR",
+                "details": str(e)
             })
             print(f"⚠️ ERROR - {e}")
 
     def test_rate_limiting(self):
-        """Test 8: Rate Limiting Check"""
         test_name = "Rate Limiting"
         print(f"[TEST 8] {test_name}...", end=" ")
-        
+
         try:
-            # Send multiple rapid requests
             request_count = 20
             rate_limited = False
-            status_codes = []
-            
-            print(f"\n   └─ Sending {request_count} rapid requests...", end=" ")
-            
-            for i in range(request_count):
-                try:
-                    response = requests.get(self.api_url, timeout=self.timeout)
-                    status_codes.append(response.status_code)
-                    
-                    # Check for rate limiting responses
-                    if response.status_code == 429:  # Too Many Requests
-                        rate_limited = True
-                        break
-                    
-                    # Some APIs use 503 for rate limiting
-                    if response.status_code == 503:
-                        if 'rate' in response.text.lower() or 'limit' in response.text.lower():
-                            rate_limited = True
-                            break
-                    
-                except requests.exceptions.RequestException:
+
+            for _ in range(request_count):
+                response = requests.get(self.api_url, timeout=self.timeout)
+                if response.status_code == 429:
+                    rate_limited = True
                     break
-            
-            if rate_limited:
-                status = 'PASS'
-                details = f'Rate limiting detected (received 429/503 after {len(status_codes)} requests)'
-            else:
-                status = 'WARNING'
-                details = f'No rate limiting detected - sent {len(status_codes)} requests without restriction'
-            
-            self.results['tests'].append({
-                'name': test_name,
-                'status': status,
-                'details': details,
-                'category': 'Rate Limiting'
+
+            status = "PASS" if rate_limited else "WARNING"
+            details = (
+                "Rate limiting detected"
+                if rate_limited else
+                "No rate limiting detected"
+            )
+
+            self.results["tests"].append({
+                "name": test_name,
+                "status": status,
+                "details": details
             })
-            
-            icon = '✅' if status == 'PASS' else '⚠️'
-            print(f"\r   └─ Tested with {len(status_codes)} requests")
-            print(f"[TEST 8] {test_name}... {icon} {status}")
-            
+
+            print(("✅" if rate_limited else "⚠️"), status)
+
         except Exception as e:
-            self.results['tests'].append({
-                'name': test_name,
-                'status': 'ERROR',
-                'details': f'Test error: {str(e)}',
-                'category': 'Rate Limiting'
+            self.results["tests"].append({
+                "name": test_name,
+                "status": "ERROR",
+                "details": str(e)
             })
-            print(f"\r⚠️ ERROR - {str(e)}")
+            print(f"⚠️ ERROR - {e}")
+
+    def test_excessive_data_exposure(self):
+        test_name = "Excessive Data Exposure"
+        print(f"[TEST 9] {test_name}...", end=" ")
+
+        try:
+            response = requests.get(self.api_url, timeout=self.timeout)
+            text = response.text.lower()
+
+            sensitive_keywords = [
+                "password", "token", "api_key",
+                "secret", "credit", "ssn"
+            ]
+
+            found = [k for k in sensitive_keywords if k in text]
+
+            if found:
+                status = "WARNING"
+                details = f"Sensitive keywords found: {', '.join(found)}"
+            else:
+                status = "PASS"
+                details = "No sensitive data exposure detected"
+
+            self.results["tests"].append({
+                "name": test_name,
+                "status": status,
+                "details": details
+            })
+
+            print(("⚠️" if found else "✅"), status)
+
+        except Exception as e:
+            self.results["tests"].append({
+                "name": test_name,
+                "status": "ERROR",
+                "details": str(e)
+            })
+            print(f"⚠️ ERROR - {e}")
+
+    def test_ssrf_vulnerability(self):
+        test_name = "SSRF Vulnerability"
+        print(f"[TEST 10] {test_name}...", end=" ")
+
+        ssrf_payloads = [
+            "http://localhost",
+            "http://127.0.0.1",
+            "http://169.254.169.254"
+        ]
+
+        vulnerable = False
+
+        try:
+            for payload in ssrf_payloads:
+                test_url = f"{self.api_url}?url={payload}"
+                response = requests.get(test_url, timeout=self.timeout)
+
+                if payload in response.text:
+                    vulnerable = True
+                    break
+
+            status = "FAIL" if vulnerable else "PASS"
+            details = (
+                "SSRF vulnerability detected"
+                if vulnerable else
+                "No SSRF detected"
+            )
+
+            self.results["tests"].append({
+                "name": test_name,
+                "status": status,
+                "details": details
+            })
+
+            print(("❌" if vulnerable else "✅"), status)
+
+        except Exception as e:
+            self.results["tests"].append({
+                "name": test_name,
+                "status": "ERROR",
+                "details": str(e)
+            })
+            print(f"⚠️ ERROR - {e}")
 
     def display_summary(self):
         print(f"\n{'=' * 50}")
         print("📊 SCAN SUMMARY")
         print(f"{'=' * 50}")
 
-        total = len(self.results['tests'])
-        passed = sum(1 for t in self.results['tests'] if t['status'] == "PASS")
-        failed = sum(1 for t in self.results['tests'] if t['status'] == "FAIL")
-        warnings = sum(1 for t in self.results['tests'] if t['status'] == "WARNING")
+        total = len(self.results["tests"])
+        passed = sum(1 for t in self.results["tests"] if t["status"] == "PASS")
+        failed = sum(1 for t in self.results["tests"] if t["status"] == "FAIL")
+        warnings = sum(1 for t in self.results["tests"] if t["status"] == "WARNING")
 
         print(f"Total Tests: {total}")
         print(f"✅ Passed: {passed}")
