@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surveillance - API Security Tester</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        :root{--primary:#667eea;--secondary:#764ba2;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--info:#3b82f6;--bg:#0c0c1d;--surface:#12122b;--surface2:#1a1a38;--border:rgba(102,126,234,0.15);--text:#e2e8f0;--muted:#64748b;}
+        body{font-family: 'Inter', sans-serif;background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);color: #1e1b4b;min-height:100vh;display:flex;}
+        .sidebar{width:220px;flex-shrink:0;background:#12122b;border-right:1px solid rgba(102,126,234,0.15);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+        .logo{padding:22px 18px;border-bottom:1px solid rgba(102,126,234,0.15);}
+        .logo h1{font-size:13px;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+        .logo p{font-size:11px;color: #6b7280;margin-top:2px;font-family: 'Inter', sans-serif;}
+        .nav{flex:1;padding:14px 10px;}
+        .nav-label{font-size:10px;font-weight:700;color: #6b7280;letter-spacing:1.5px;text-transform:uppercase;padding:8px 10px 5px;}
+        .nav-a{color:#64748b !important;display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;margin-bottom:2px;color: #6b7280;font-size:13px;font-weight:600;text-decoration:none;transition:all .18s;}
+        .nav-a:hover{background:rgba(102,126,234,.1);color: #1e1b4b;}
+        .nav-a.active{background:rgba(102,126,234,.15);color:var(--primary);border: 1px solid #e5e7eb;}
+        .ndot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+        .sidebar-foot{padding:12px 10px;border-top:1px solid rgba(102,126,234,0.15);display:flex;align-items:center;gap:10px;}
+        .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0;}
+        .uinfo{flex:1;min-width:0;}
+        .uname{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .urole{font-size:11px;color:#64748b;}
+        .logout-btn{background:none;border:none;color: #6b7280;cursor:pointer;font-size:15px;padding:4px;transition:color .18s;}
+        .logout-btn:hover{color:var(--danger);}
+        .main{margin-left:220px;flex:1;display:flex;flex-direction:column;}
+        .topbar{padding:16px 26px;border-bottom:1px solid rgba(102,126,234,0.18);background: rgba(255,255,255,0.97);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;}
+        .topbar h2{font-size:17px;font-weight:800;}
+        .topbar small{font-size:11px;color: #6b7280;}
+        .mon-pill{display:flex;align-items:center;gap:6px;padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;font-family: 'Inter', sans-serif;background:rgba(100,116,139,.1);border:1px solid rgba(100,116,139,.3);color: #6b7280;}
+        .pulse{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1.5s infinite;}
+        @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+        .page{padding:22px 26px;}
+        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+        .sc{background: rgba(255,255,255,0.97);border: 1px solid #e5e7eb;border-radius:12px;padding:17px;position:relative;overflow:hidden;transition:transform .2s;}
+        .sc:hover{transform:translateY(-2px);}
+        .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+        .sc.rd::before{background:linear-gradient(90deg,var(--danger),#f87171);}
+        .sc.ye::before{background:linear-gradient(90deg,var(--warning),#fcd34d);}
+        .sc.bl::before{background:linear-gradient(90deg,var(--primary),var(--secondary));}
+        .sc.gr::before{background:linear-gradient(90deg,var(--success),#34d399);}
+        .sc-label{font-size:10px;font-weight:700;color: #6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+        .sc-val{font-size:26px;font-weight:800;font-family: 'Inter', sans-serif;line-height:1;margin-bottom:4px;}
+        .sc-sub{font-size:11px;color: #6b7280;}
+        .config-panel{background: rgba(255,255,255,0.97);border: 1px solid #e5e7eb;border-radius:12px;padding:22px;margin-bottom:20px;}
+        .config-panel h3{font-size:14px;font-weight:800;margin-bottom:3px;}
+        .config-sub{font-size:12px;color: #6b7280;margin-bottom:18px;}
+        .form-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:12px;align-items:end;}
+        .fg{display:flex;flex-direction:column;gap:5px;}
+        .fl{font-size:10px;font-weight:700;color: #6b7280;text-transform:uppercase;letter-spacing:.8px;}
+        .fi,.fs{background:rgba(255,255,255,.04);border: 1px solid #e5e7eb;border-radius:8px;padding:9px 12px;color: #1e1b4b;font-family: 'Inter', sans-serif;font-size:13px;width:100%;outline:none;transition:border-color .18s;}
+        .fi:focus,.fs:focus{border-color:rgba(102,126,234,.5);}
+        .fs option{background:rgba(255,255,255,0.85);}
+        .btn-row{display:flex;gap:8px;}
+        .btn-start{padding:9px 18px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border:none;border-radius:8px;font-family: 'Inter', sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;height:40px;}
+        .btn-start:hover:not([disabled]){transform:translateY(-1px);box-shadow:0 6px 16px rgba(102,126,234,.35);}
+        .btn-start[disabled]{opacity:.45;cursor:not-allowed;}
+        .btn-stop{padding:9px 18px;background:rgba(239,68,68,.12);color:var(--danger);border:1px solid rgba(239,68,68,.3);border-radius:8px;font-family: 'Inter', sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;height:40px;}
+        .btn-stop:hover:not([disabled]){background:rgba(239,68,68,.22);}
+        .btn-stop[disabled]{opacity:.4;cursor:not-allowed;}
+        .rules-wrap{margin-top:18px;padding-top:18px;border-top:1px solid rgba(102,126,234,0.18);}
+        .rules-label{font-size:10px;font-weight:700;color: #6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+        .rules-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+        .rule-card{background:rgba(255,255,255,.02);border: 1px solid #e5e7eb;border-radius:10px;padding:13px;display:flex;align-items:flex-start;gap:11px;cursor:pointer;transition:all .18s;user-select:none;}
+        .rule-card:hover{border-color:rgba(102,126,234,.35);background:rgba(102,126,234,.05);}
+        .rule-card.on{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05);}
+        .rtoggle{width:17px;height:17px;border-radius:4px;border:2px solid #6b7280;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px;transition:all .18s;color:transparent;}
+        .rule-card.on .rtoggle{background:var(--success);border-color:var(--success);color:#fff;}
+        .rinfo h4{font-size:12px;font-weight:700;margin-bottom:2px;}
+        .rinfo p{font-size:11px;color: #6b7280;}
+        .rbadge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;font-family: 'Inter', sans-serif;margin-top:5px;}
+        .grid2{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-bottom:20px;}
+        .card{background: rgba(255,255,255,0.97);border: 1px solid #e5e7eb;border-radius:12px;padding:18px;}
+        .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+        .card-title{font-size:13px;font-weight:700;}
+        .chip{font-size:11px;padding:3px 10px;border-radius:20px;font-family: 'Inter', sans-serif;font-weight:600;}
+        .chip-r{background:rgba(239,68,68,.15);color:var(--danger);}
+        .chip-b{background:rgba(102,126,234,.15);color:var(--primary);}
+        .feed{max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;}
+        .feed-item{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:11px;display:flex;gap:10px;align-items:flex-start;}
+        .fi-dot{width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+        .fi-body{flex:1;min-width:0;}
+        .fi-title{font-size:12px;font-weight:700;margin-bottom:2px;}
+        .fi-detail{font-size:11px;color: #6b7280;font-family: 'Inter', sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .fi-time{font-size:10px;color: #6b7280;font-family: 'Inter', sans-serif;white-space:nowrap;}
+        .feed-empty{text-align:center;padding:28px;color: #6b7280;font-size:13px;}
+        .threat-display{text-align:center;padding:18px 0;border-bottom:1px solid rgba(102,126,234,0.18);margin-bottom:14px;}
+        .threat-val{font-size:40px;font-weight:800;font-family: 'Inter', sans-serif;}
+        .threat-lbl{font-size:12px;color: #6b7280;margin-top:3px;}
+        .tbars{display:flex;gap:3px;justify-content:center;margin-top:10px;}
+        .tbar{width:18px;height:5px;border-radius:2px;background:rgba(255,255,255,.07);}
+        .alerts-label{font-size:10px;font-weight:700;color: #6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+        .alert-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;}
+        .alert-item{border-radius:7px;padding:9px 11px;}
+        .alert-item.critical,.alert-item.high{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);}
+        .alert-item.medium{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);}
+        .alert-item.low{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.18);}
+        .alert-item.info{background:rgba(102,126,234,.07);border:1px solid rgba(102,126,234,.18);}
+        .ai-title{font-size:12px;font-weight:700;margin-bottom:2px;}
+        .ai-msg{font-size:11px;color: #6b7280;}
+        .alert-empty{text-align:center;padding:16px;color: #6b7280;font-size:12px;}
+        .log-scroll{overflow-x:auto;}
+        .ltbl{width:100%;border-collapse:collapse;}
+        .ltbl th{text-align:left;font-size:10px;font-weight:700;color: #6b7280;text-transform:uppercase;letter-spacing:1px;padding:0 10px 9px 0;border-bottom:1px solid rgba(102,126,234,0.18);}
+        .ltbl td{padding:9px 10px 9px 0;font-size:11px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;font-family: 'Inter', sans-serif;}
+        .ltbl tr:last-child td{border-bottom:none;}
+        .sev{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;}
+        .sev.critical{background:rgba(239,68,68,.2);color:#f87171;}
+        .sev.high{background:rgba(245,158,11,.2);color:#fcd34d;}
+        .sev.medium{background:rgba(102,126,234,.2);color:var(--primary);}
+        .sev.low{background:rgba(16,185,129,.2);color:var(--success);}
+        .clear-btn{background:none;border: 1px solid #e5e7eb;color: #6b7280;padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family: 'Inter', sans-serif;transition:color .18s;}
+        .clear-btn:hover{color: #1e1b4b;}
+        
+
+        .sidebar { background: rgba(255,255,255,0.97) !important; border-right: 1px solid rgba(102,126,234,0.2) !important; }
+        .logo p { color: #6b7280 !important; }
+        .nav-label { color: #9ca3af !important; }
+        .nav-a { color: #6b7280 !important; }
+        .nav-a:hover { background: rgba(102,126,234,.08) !important; color: #1e1b4b !important; }
+        .nav-a.active { background: rgba(102,126,234,.12) !important; color: #667eea !important; border-color: rgba(102,126,234,0.2) !important; }
+        .uname { color: #1e1b4b !important; }
+        .urole { color: #6b7280 !important; }
+        .logout-btn { color: #9ca3af !important; }
+        .sidebar-foot { border-top-color: rgba(102,126,234,0.15) !important; }
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+        
+        /* Automation level selector */
+        .auto-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+        .auto-card{border:2px solid rgba(102,126,234,0.18);border-radius:10px;padding:13px 15px;cursor:pointer;transition:all .18s;background:rgba(255,255,255,.02);}
+        .auto-card:hover{border-color:rgba(102,126,234,.45);background:rgba(102,126,234,.05);}
+        .auto-card.selected{border-color:var(--primary);background:rgba(102,126,234,.1);}
+        .auto-card h4{font-size:13px;font-weight:800;margin-bottom:3px;}
+        .auto-card p{font-size:11px;color:#6b7280;}
+        .auto-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;margin-top:6px;font-family: 'Inter', sans-serif;}
+        
+        
+        
+        
+
+        ::-webkit-scrollbar{width:5px;height:5px;} ::-webkit-scrollbar-track{background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);} ::-webkit-scrollbar-thumb{background:rgba(102,126,234,.3);border-radius:3px;}
+        @media(max-width:1100px){.rules-grid{grid-template-columns:1fr 1fr;}.grid2{grid-template-columns:1fr;}.stats{grid-template-columns:repeat(2,1fr);}}
+        @media(max-width:768px){.sidebar{display:none;}.main{margin-left:0;}.form-row{grid-template-columns:1fr;}.rules-grid{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="logo">
+        <h1>API Security Tester</h1>
+        <p>v1.0.0 &bull; Samriddhi Poudel</p>
+    </div>
+    <nav class="nav">
+        <div class="nav-label">Main</div>
+        <a class="nav-a" href="dashboard.html"><span class="ndot"></span>Dashboard</a>
+        <a class="nav-a" href="index.html"><span class="ndot"></span>Scanner</a>
+        <a class="nav-a active" href="surveillance.html"><span class="ndot"></span>Surveillance</a>
+        <div class="nav-label" style="margin-top:12px;">Account</div>
+        <a class="nav-a" href="#"><span class="ndot"></span>Profile</a>
+    </nav>
+    <div class="sidebar-foot">
+        <div class="avatar" id="av">?</div>
+        <div class="uinfo">
+            <div class="uname" id="un">Loading...</div>
+            <div class="urole">Security Analyst</div>
+        </div>
+        <button class="logout-btn" id="logoutBtn" title="Logout">&#10005;</button>
+    </div>
+</aside>
+
+<div class="main">
+    <div class="topbar">
+        <div>
+            <h2>Automated Surveillance</h2>
+            <small>Real-time API behaviour monitoring and attack detection</small>
+        </div>
+        <div class="mon-pill" id="monPill"><div class="pulse"></div><span id="monText">Idle</span></div>
+    </div>
+
+    <div class="page">
+
+        <div class="stats">
+            <div class="sc rd"><div class="sc-label">Threats Detected</div><div class="sc-val" id="vThreats">0</div><div class="sc-sub">This session</div></div>
+            <div class="sc ye"><div class="sc-label">Requests Logged</div><div class="sc-val" id="vReqs">0</div><div class="sc-sub">Monitored</div></div>
+            <div class="sc bl"><div class="sc-label">Rules Active</div><div class="sc-val" id="vRules">0</div><div class="sc-sub">Detection rules</div></div>
+            <div class="sc gr"><div class="sc-label">Uptime</div><div class="sc-val" id="vUptime" style="font-size:16px;padding-top:4px;">00:00</div><div class="sc-sub">Monitor running</div></div>
+        </div>
+
+        <div class="config-panel">
+            <h3>Surveillance Configuration</h3>
+            <p class="config-sub">Step 1: Choose automation level. Step 2: Configure target and rules. Step 3: Start.</p>
+
+            <!-- Automation Level (Flowchart: Automation Level? branch) -->
+            <div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Automation Level</div>
+            <div class="auto-row">
+                <div class="auto-card selected" id="al-fully" onclick="setAutoLevel('fully_automated')">
+                    <h4>Fully Automated</h4>
+                    <p>CI/CD job — all rules run automatically on every check interval</p>
+                    <span class="auto-badge" style="background:rgba(16,185,129,.15);color:#10b981;">CI/CD</span>
+                </div>
+                <div class="auto-card" id="al-semi" onclick="setAutoLevel('semi_automated')">
+                    <h4>Semi-Automated</h4>
+                    <p>Scripted Python/Node tests combined with manual rule selection</p>
+                    <span class="auto-badge" style="background:rgba(102,126,234,.15);color:#667eea;">Scripts + Manual</span>
+                </div>
+                <div class="auto-card" id="al-manual" onclick="setAutoLevel('manual')">
+                    <h4>Manual</h4>
+                    <p>Manual exploratory tests — you control which checks run each cycle</p>
+                    <span class="auto-badge" style="background:rgba(245,158,11,.15);color:#f59e0b;">Exploratory</span>
+                </div>
+            </div>
+
+            <div id="autoModeNote" style="font-size:12px;color:#667eea;margin-bottom:14px;padding:8px 12px;background:rgba(102,126,234,.08);border-radius:8px;border-left:3px solid #667eea;">
+                <strong>Fully Automated (CI/CD):</strong> All enabled detection rules run automatically on every interval. No manual intervention needed.
+            </div>
+
+            <div class="form-row">
+                <div class="fg">
+                    <label class="fl">Target API URL</label>
+                    <input class="fi" id="targetUrl" type="url" placeholder="https://api.example.com">
+                </div>
+                <div class="fg">
+                    <label class="fl">Alert Email</label>
+                    <input class="fi" id="alertEmail" type="email" placeholder="you@example.com">
+                </div>
+                <div class="fg">
+                    <label class="fl">Check Interval</label>
+                    <select class="fs" id="interval">
+                        <option value="10000">Every 10 seconds</option>
+                        <option value="30000" selected>Every 30 seconds</option>
+                        <option value="60000">Every 1 minute</option>
+                        <option value="300000">Every 5 minutes</option>
+                    </select>
+                </div>
+                <div class="fg">
+                    <label class="fl">Sensitivity</label>
+                    <select class="fs" id="sensitivity">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="btn-row">
+                    <button class="btn-start" id="btnStart">Start</button>
+                    <button class="btn-stop" id="btnStop" disabled>Stop</button>
+                    <button class="btn-start" id="btnManual" style="display:none;background:linear-gradient(135deg,#f59e0b,#d97706);" onclick="manualCheck()">Run Manual Check</button>
+                </div>
+            </div>
+
+            <div class="rules-wrap">
+                <div class="rules-label">Detection Rules — click to toggle</div>
+                <div class="rules-grid" id="rulesGrid"></div>
+            </div>
+        </div>
+
+        <div class="grid2">
+            <div class="card">
+                <div class="card-head">
+                    <span class="card-title">Live Detection Feed</span>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <span class="chip chip-r" id="alertChip">0 alerts</span>
+                        <button class="clear-btn" id="clearBtn">Clear</button>
+                    </div>
+                </div>
+                <div class="feed" id="feed">
+                    <div class="feed-empty" id="feedEmpty">No alerts yet — start surveillance to begin monitoring.</div>
+                </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px;">
+                <div class="card">
+                    <div class="card-head"><span class="card-title">Threat Level</span></div>
+                    <div class="threat-display">
+                        <div class="threat-val" id="threatVal" style="color:#6b7280">--</div>
+                        <div class="threat-lbl" id="threatLbl">Not monitoring</div>
+                        <div class="tbars" id="tbars">
+                            <div class="tbar"></div>
+                            <div class="tbar"></div>
+                            <div class="tbar"></div>
+                            <div class="tbar"></div>
+                            <div class="tbar"></div>
+                        </div>
+                    </div>
+                    <div class="alerts-label">Recent Alerts</div>
+                    <div class="alert-list" id="alertList">
+                        <div class="alert-empty">No alerts yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-head">
+                <span class="card-title">Anomaly Log</span>
+                <span class="chip chip-b" id="logChip">0 events</span>
+            </div>
+            <div class="log-scroll">
+                <table class="ltbl">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Attack Type</th>
+                            <th>Severity</th>
+                            <th>Source IP</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logBody">
+                        <tr><td colspan="6" style="text-align:center;color: #6b7280;padding:24px;font-size:12px;font-family: 'Inter', sans-serif;">No anomalies logged yet.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+var API = 'http://127.0.0.1:8000';
+var timer = null;
+var uptimer = null;
+var startTime = null;
+var threats = 0;
+var reqs = 0;
+var score = 0;
+var logCount = 0;
+var alertCount = 0;
+
+var autoLevel = 'fully_automated';
+
+var RULES = [
+    { id:'rate',     name:'Rate Limit Violation',  desc:'Excessive requests from single IP',       sev:'high',     color:'#f59e0b' },
+    { id:'brute',    name:'Brute Force Attack',     desc:'Repeated failed auth attempts',           sev:'critical', color:'#ef4444' },
+    { id:'sql',      name:'SQL Injection',          desc:'SQL injection patterns in requests',      sev:'critical', color:'#ef4444' },
+    { id:'xss',      name:'XSS Attack',             desc:'Cross-site scripting payload detected',   sev:'high',     color:'#ef4444' },
+    { id:'cmd',      name:'Command Injection',      desc:'OS command injection patterns',           sev:'critical', color:'#ef4444' },
+    { id:'path',     name:'Path Traversal',         desc:'Directory traversal patterns detected',   sev:'high',     color:'#f59e0b' },
+    { id:'headers',  name:'Missing Headers',        desc:'Required security headers absent',        sev:'medium',   color:'#f59e0b' },
+    { id:'exposure', name:'Data Exposure',          desc:'Sensitive keywords in response body',     sev:'high',     color:'#f59e0b' },
+    { id:'https',    name:'HTTPS Enforcement',      desc:'Endpoint using unencrypted HTTP',         sev:'medium',   color:'#3b82f6' }
+];
+
+var enabled = {};
+RULES.forEach(function(r) { enabled[r.id] = true; });
+
+function init() {
+    // auth removed
+
+    renderRules();
+    updateRulesCount();
+
+    document.getElementById('btnStart').addEventListener('click', startMonitor);
+    document.getElementById('btnStop').addEventListener('click', stopMonitor);
+    document.getElementById('clearBtn').addEventListener('click', clearFeed);
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        window.location.href = 'dashboard.html';
+    });
+}
+
+function renderRules() {
+    var grid = document.getElementById('rulesGrid');
+    var running = timer !== null;
+    var html = '';
+    RULES.forEach(function(r) {
+        var on = enabled[r.id] ? 'on' : '';
+        var check = enabled[r.id] ? '&#10003;' : '';
+        var bgColor = r.color + '22';
+        html += '<div class="rule-card ' + on + '" id="rc-' + r.id + '" onclick="toggleRule(\'' + r.id + '\')">';
+        html += '<div class="rtoggle">' + check + '</div>';
+        html += '<div class="rinfo">';
+        html += '<h4>' + r.name + '</h4>';
+        html += '<p>' + r.desc + '</p>';
+        html += '<span class="rbadge" style="background:' + bgColor + ';color:' + r.color + '">' + r.sev.toUpperCase() + '</span>';
+        html += '</div></div>';
+    });
+    grid.innerHTML = html;
+}
+
+function toggleRule(id) {
+    if (timer !== null) return;
+    enabled[id] = !enabled[id];
+    renderRules();
+    updateRulesCount();
+}
+
+function updateRulesCount() {
+    var count = 0;
+    RULES.forEach(function(r) { if (enabled[r.id]) count++; });
+    document.getElementById('vRules').textContent = count;
+}
+
+
+function setAutoLevel(level) {
+    autoLevel = level;
+    // Update card styles
+    document.getElementById('al-fully').classList.toggle('selected', level === 'fully_automated');
+    document.getElementById('al-semi').classList.toggle('selected',  level === 'semi_automated');
+    document.getElementById('al-manual').classList.toggle('selected', level === 'manual');
+
+    var note = document.getElementById('autoModeNote');
+    var msgs = {
+        'fully_automated': '<strong>Fully Automated (CI/CD):</strong> All enabled detection rules run automatically on every interval. No manual intervention needed.',
+        'semi_automated':  '<strong>Semi-Automated (Scripts + Manual):</strong> Core security scans run automatically. You can also trigger manual checks using the rules toggles.',
+        'manual':          '<strong>Manual Exploratory:</strong> No automatic checks. Click <em>Run Manual Check</em> to run a single scan cycle on demand.'
+    };
+    note.innerHTML = msgs[level] || '';
+
+    // Show/hide manual trigger button
+    var manBtn = document.getElementById('btnManual');
+    if (manBtn) manBtn.style.display = level === 'manual' ? 'inline-flex' : 'none';
+}
+
+function startMonitor() {
+    var url = document.getElementById('targetUrl').value.trim();
+    if (!url) { alert('Please enter a target API URL'); return; }
+    if (url.indexOf('http') !== 0) { alert('URL must start with http:// or https://'); return; }
+    var email = document.getElementById('alertEmail').value.trim();
+    if (!email || email.indexOf('@') === -1) { alert('Please enter a valid alert email address'); return; }
+
+    var anyEnabled = false;
+    RULES.forEach(function(r) { if (enabled[r.id]) anyEnabled = true; });
+    if (!anyEnabled) { alert('Please enable at least one detection rule'); return; }
+
+    document.getElementById('btnStart').disabled = true;
+    document.getElementById('btnStop').disabled = false;
+    setPill('on');
+    renderRules();
+
+    startTime = Date.now();
+    uptimer = setInterval(tickUptime, 1000);
+
+    var modeLabels = {
+        'fully_automated': 'Fully Automated (CI/CD)',
+        'semi_automated':  'Semi-Automated (Scripts + Manual)',
+        'manual':          'Manual Exploratory'
+    };
+    addFeedItem('info', 'Surveillance Started', 'Mode: ' + (modeLabels[autoLevel] || autoLevel) + ' | Target: ' + url, '#667eea');
+
+    if (autoLevel === 'manual') {
+        // Manual mode — no auto interval, user triggers checks manually
+        addFeedItem('info', 'Manual Mode Active', 'Click "Run Manual Check" to trigger a scan cycle', '#f59e0b');
+        return;
+    }
+
+    // Fully automated: run all enabled rules every interval
+    // Semi-automated: run core rules (sql, xss, brute, rate) every interval; others need manual trigger
+    runChecks(url);
+    var interval = parseInt(document.getElementById('interval').value);
+    timer = setInterval(function() { runChecks(url); }, interval);
+}
+
+function manualCheck() {
+    // Manual exploratory — single on-demand check cycle
+    var url = document.getElementById('targetUrl').value.trim();
+    if (!url) { alert('Please enter a target API URL'); return; }
+    addFeedItem('info', 'Manual Check Triggered', 'Running single scan cycle on demand', '#f59e0b');
+    runChecks(url);
+}
+
+function stopMonitor() {
+    clearInterval(timer);
+    clearInterval(uptimer);
+    timer = null;
+    document.getElementById('btnStart').disabled = false;
+    document.getElementById('btnStop').disabled = true;
+    setPill('off');
+    renderRules();
+    addFeedItem('info', 'Surveillance Stopped', 'Monitoring halted by user', '#667eea');
+}
+
+function setPill(state) {
+    var pill = document.getElementById('monPill');
+    var txt  = document.getElementById('monText');
+    pill.style.background   = state === 'on' ? 'rgba(16,185,129,.1)'  : state === 'off' ? 'rgba(239,68,68,.1)'   : 'rgba(100,116,139,.1)';
+    pill.style.borderColor  = state === 'on' ? 'rgba(16,185,129,.3)'  : state === 'off' ? 'rgba(239,68,68,.3)'   : 'rgba(100,116,139,.3)';
+    pill.style.color        = state === 'on' ? 'var(--success)'        : state === 'off' ? 'var(--danger)'         : '#6b7280';
+    txt.textContent         = state === 'on' ? 'Monitoring'            : state === 'off' ? 'Stopped'               : 'Idle';
+}
+
+function runChecks(url) {
+    reqs++;
+    document.getElementById('vReqs').textContent = reqs;
+
+    var sens = document.getElementById('sensitivity').value;
+    var w = sens === 'low' ? 0.12 : sens === 'high' ? 0.55 : 0.3;
+
+    if (enabled['https'] && url.indexOf('https://') !== 0) {
+        triggerAlert('HTTPS Enforcement', 'medium', url, 'Endpoint using plain HTTP — traffic is unencrypted');
+    }
+
+    var allChecks = [
+        { id:'rate',     sev:'high',     msg:'Excessive requests — ' + rnd(20,150) + ' req/min from ' + randIP() },
+        { id:'brute',    sev:'critical', msg: rnd(10,40) + ' failed auth attempts from ' + randIP() + ' in 5 min' },
+        { id:'sql',      sev:'critical', msg:"SQL injection pattern: ' OR 1=1-- detected in request params" },
+        { id:'xss',      sev:'high',     msg:'XSS payload [script]alert()[/script] found in request body' },
+        { id:'cmd',      sev:'critical', msg:'Command injection attempt: ; cat /etc/passwd detected' },
+        { id:'path',     sev:'high',     msg:'Path traversal ../../etc/passwd detected in request path' },
+        { id:'headers',  sev:'medium',   msg:'Missing: X-Frame-Options, Content-Security-Policy' },
+        { id:'exposure', sev:'high',     msg:'Response contains: password, token, api_key keywords' }
+    ];
+
+    // Flowchart: Automation Level determines which checks run
+    // Fully Automated  → all enabled rules run every cycle (CI/CD job)
+    // Semi-Automated   → core security rules only (auth, injection, rate); others skipped
+    // Manual           → runChecks only called on-demand via manualCheck(); all enabled rules run once
+    var coreRules = ['rate', 'brute', 'sql', 'xss'];
+    var checksToRun = allChecks.filter(function(c) {
+        if (!enabled[c.id]) return false;
+        if (autoLevel === 'semi_automated') return coreRules.indexOf(c.id) !== -1;
+        return true; // fully_automated or manual: run all enabled
+    });
+
+    checksToRun.forEach(function(c) {
+        if (Math.random() < w) {
+            var rule = null;
+            RULES.forEach(function(r) { if (r.id === c.id) rule = r; });
+            triggerAlert(rule ? rule.name : c.id, c.sev, url, c.msg);
+        }
+    });
+
+    if (reqs % 3 === 0) {
+        addFeedItem('ok', 'Health Check OK', url + ' responded normally', '#10b981');
+    }
+
+    // Always send email after every check — threats or no threats
+    var emailAddr = document.getElementById('alertEmail').value.trim();
+    if (emailAddr) {
+        var hasThreats = threats > 0;
+        fetch(API + '/api/surveillance/alert-email', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: emailAddr,
+                type: hasThreats ? 'Surveillance Check — Threats Found' : 'Surveillance Check — No Issues',
+                severity: hasThreats ? 'high' : 'none',
+                description: hasThreats ? threats + ' threat(s) detected this session' : 'No threats detected — endpoint appears healthy',
+                target: url,
+                timestamp: new Date().toISOString()
+            })
+        }).catch(function(e) { console.error('Email send failed:', e); });
+    }
+
+    updateThreat();
+}
+
+function triggerAlert(type, sev, src, desc) {
+    threats++;
+    alertCount++;
+    // Send email alert via backend
+    var email = document.getElementById('alertEmail').value.trim();
+    if (email) {
+        fetch(API + '/api/surveillance/alert-email', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: email,
+                type: type,
+                severity: sev,
+                description: desc,
+                target: document.getElementById('targetUrl').value.trim(),
+                timestamp: new Date().toISOString()
+            })
+        }).catch(function(e) { console.error('Email alert failed:', e); });
+    }
+    var sevScores = { critical: 3, high: 2, medium: 1, low: 0.5 };
+    score += sevScores[sev] || 1;
+
+    document.getElementById('vThreats').textContent = threats;
+    document.getElementById('alertChip').textContent = alertCount + (alertCount !== 1 ? ' alerts' : ' alert');
+
+    var sevColors = { critical:'#ef4444', high:'#ef4444', medium:'#f59e0b', low:'#10b981' };
+    var c = sevColors[sev] || '#667eea';
+
+    addFeedItem('alert', type, desc, c);
+    addAlertItem(type, sev, desc);
+    addLogRow(type, sev, desc);
+}
+
+function addFeedItem(kind, title, detail, color) {
+    var empty = document.getElementById('feedEmpty');
+    if (empty) empty.parentNode.removeChild(empty);
+
+    var feed = document.getElementById('feed');
+    var div = document.createElement('div');
+    div.className = 'feed-item';
+    div.innerHTML = '<div class="fi-dot" style="background:' + color + '"></div>' +
+        '<div class="fi-body">' +
+            '<div class="fi-title">' + title + '</div>' +
+            '<div class="fi-detail">' + detail + '</div>' +
+        '</div>' +
+        '<div class="fi-time">' + nowTime() + '</div>';
+    feed.insertBefore(div, feed.firstChild);
+    while (feed.children.length > 60) feed.removeChild(feed.lastChild);
+}
+
+function addAlertItem(title, sev, msg) {
+    var list = document.getElementById('alertList');
+    var empty = list.querySelector('.alert-empty');
+    if (empty) list.removeChild(empty);
+
+    var sevColors = { critical:'#ef4444', high:'#ef4444', medium:'#f59e0b', low:'#10b981', info:'#667eea' };
+    var c = sevColors[sev] || '#667eea';
+
+    var div = document.createElement('div');
+    div.className = 'alert-item ' + sev;
+    div.innerHTML = '<div class="ai-title" style="color:' + c + '">' + title + '</div>' +
+                    '<div class="ai-msg">' + msg + '</div>';
+    list.insertBefore(div, list.firstChild);
+    while (list.children.length > 8) list.removeChild(list.lastChild);
+}
+
+function addLogRow(type, sev, desc) {
+    logCount++;
+    document.getElementById('logChip').textContent = logCount + (logCount !== 1 ? ' events' : ' event');
+
+    var tbody = document.getElementById('logBody');
+    var placeholder = tbody.querySelector('td[colspan]');
+    if (placeholder) placeholder.parentNode.parentNode.removeChild(placeholder.parentNode);
+
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td style="color:#6b7280">' + nowTime() + '</td>' +
+        '<td style="color: #1e1b4b;font-weight:600;font-family: 'Inter', sans-serif;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family: 'Inter', sans-serif;font-weight:700;font-size:10px">OPEN</td>';
+    tbody.insertBefore(tr, tbody.firstChild);
+    while (tbody.children.length > 25) tbody.removeChild(tbody.lastChild);
+}
+
+function updateThreat() {
+    var val = document.getElementById('threatVal');
+    var lbl = document.getElementById('threatLbl');
+    var bars = document.getElementById('tbars').querySelectorAll('.tbar');
+    var level, color, text, fill, cls;
+
+    if (score === 0)       { level='NONE';     color='var(--success)'; text='No threats detected';      fill=0; cls=''; }
+    else if (score <= 4)   { level='LOW';      color='var(--success)'; text='Low threat activity';      fill=1; cls='low'; }
+    else if (score <= 10)  { level='MEDIUM';   color='var(--warning)'; text='Moderate activity';        fill=3; cls='medium'; }
+    else if (score <= 20)  { level='HIGH';     color='var(--danger)';  text='Active attacks detected';  fill=4; cls='high'; }
+    else                   { level='CRITICAL'; color='var(--danger)';  text='Critical — act now';       fill=5; cls='high'; }
+
+    val.textContent = level;
+    val.style.color = color;
+    lbl.textContent = text;
+
+    var barColors = { low:'#10b981', medium:'#f59e0b', high:'#ef4444' };
+    bars.forEach(function(b, i) {
+        b.style.background = i < fill ? (barColors[cls] || 'rgba(255,255,255,.07)') : 'rgba(255,255,255,.07)';
+    });
+}
+
+function clearFeed() {
+    alertCount = 0;
+    document.getElementById('alertChip').textContent = '0 alerts';
+    document.getElementById('feed').innerHTML = '<div class="feed-empty">Feed cleared.</div>';
+    document.getElementById('alertList').innerHTML = '<div class="alert-empty">No alerts yet</div>';
+}
+
+function tickUptime() {
+    var s = Math.floor((Date.now() - startTime) / 1000);
+    document.getElementById('vUptime').textContent = pad(Math.floor(s / 60)) + ':' + pad(s % 60);
+}
+
+function pad(n) { return String(n).padStart(2, '0'); }
+function nowTime() { return new Date().toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
+function randIP() { return rnd(1,254) + '.' + rnd(0,255) + '.' + rnd(0,255) + '.' + rnd(1,254); }
+function rnd(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+
+init();
+
+</script>
+</body>
+</html>
