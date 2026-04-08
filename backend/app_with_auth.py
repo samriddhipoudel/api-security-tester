@@ -26,7 +26,11 @@ CORS(app, supports_credentials=True)
 
 @app.route('/')
 def home():
-    return send_from_directory('../frontend', 'dashboard.html')
+    return send_from_directory('../frontend', 'login.html')
+
+@app.route('/login.html')
+def login_page():
+    return send_from_directory('../frontend', 'login.html')
 
 @app.route('/dashboard.html')
 def dashboard_page():
@@ -252,17 +256,10 @@ http://127.0.0.1:8000/surveillance.html
         target=target, timestamp=timestamp, description=description
     )
 
-    smtp_host = os.getenv('SMTP_HOST', 'smtp.gmail.com')
-    smtp_port = int(os.getenv('SMTP_PORT', 587))
-    smtp_user = os.getenv('SMTP_USER', '')
-    smtp_pass = os.getenv('SMTP_PASS', '')
-
-    if not smtp_user or not smtp_pass:
-        print('[ALERT EMAIL] SMTP not configured. Would have sent to {}: {}'.format(recipient, subject))
-        return jsonify({
-            'success': False,
-            'message': 'SMTP not configured. Set SMTP_USER and SMTP_PASS environment variables.'
-        }), 200
+    smtp_host = 'smtp.gmail.com'
+    smtp_port = 587
+    smtp_user = 'apisecuritytester@gmail.com'
+    smtp_pass = 'eant hafj viai pxvw'
 
     try:
         msg = MIMEMultipart('alternative')

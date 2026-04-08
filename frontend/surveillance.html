@@ -475,6 +475,38 @@ function stopMonitor() {
     setPill('off');
     renderRules();
     addFeedItem('info', 'Surveillance Stopped', 'Monitoring halted by user', '#667eea');
+
+    // Send summary email when surveillance stops
+    var emailAddr = document.getElementById('alertEmail').value.trim();
+    var targetUrl = document.getElementById('targetUrl').value.trim();
+    if (emailAddr) {
+        var hasThreats  = threats > 0;
+        var uptime      = document.getElementById('vUptime').textContent;
+        var description = hasThreats
+            ? threats + ' threat(s) detected across ' + reqs + ' checks over ' + uptime + '. Review the anomaly log for details.'
+            : 'No threats detected across ' + reqs + ' checks over ' + uptime + '. Endpoint appears healthy.';
+        fetch(API + '/api/surveillance/alert-email', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email:       emailAddr,
+                type:        hasThreats ? 'Surveillance Session Report — Threats Found' : 'Surveillance Session Report — No Issues',
+                severity:    hasThreats ? 'high' : 'none',
+                description: description,
+                target:      targetUrl,
+                timestamp:   new Date().toISOString()
+            })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.success) {
+                addFeedItem('info', 'Alert Email Sent', 'Summary report sent to ' + emailAddr, '#10b981');
+            } else {
+                addFeedItem('info', 'Email Note', d.message || 'Email not sent', '#f59e0b');
+            }
+        })
+        .catch(function(e) { console.error('Email failed:', e); });
+    }
 }
 
 function manualCheck() {
@@ -557,23 +589,6 @@ function runChecks(url) {
 
     addFeedItem('ok', 'Health Check OK', url + ' responded normally', '#10b981');
 
-    // Send email every check cycle
-    var emailAddr = document.getElementById('alertEmail').value.trim();
-    if (emailAddr) {
-        fetch(API + '/api/surveillance/alert-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email:       emailAddr,
-                type:        threats > 0 ? 'Surveillance Check — Threats Found' : 'Surveillance Check — No Issues',
-                severity:    threats > 0 ? 'high' : 'none',
-                description: threats > 0 ? threats + ' threat(s) detected this session' : 'No threats detected — endpoint appears healthy',
-                target:      url,
-                timestamp:   new Date().toISOString()
-            })
-        }).catch(function(e) { console.error('Email failed:', e); });
-    }
-
     updateThreat();
 }
 
@@ -593,18 +608,7 @@ function triggerAlert(type, sev, src, desc) {
     addAlertItem(type, sev, desc);
     addLogRow(type, sev, desc);
 
-    // Send individual threat email
-    var email = document.getElementById('alertEmail').value.trim();
-    if (email) {
-        fetch(API + '/api/surveillance/alert-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: email, type: type, severity: sev,
-                description: desc, target: src, timestamp: new Date().toISOString()
-            })
-        }).catch(function(e) { console.error('Email failed:', e); });
-    }
+
 }
 
 // ── Feed / Alert / Log helpers ────────────────────────────────────────────────

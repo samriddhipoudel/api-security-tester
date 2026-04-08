@@ -273,6 +273,15 @@ function showLoading() {
     if (saveBtn) saveBtn.disabled = true;
 }
 
+function cancelScan() {
+    if (scanController) {
+        scanController.abort();
+        scanController = null;
+    }
+    hideLoading();
+    showNotification('Scan cancelled.', 'info');
+}
+
 function hideLoading() {
     document.getElementById('loadingIndicator').style.display = 'none';
     const scanBtn = document.getElementById('scanBtn');

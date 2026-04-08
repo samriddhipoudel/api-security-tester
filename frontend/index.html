@@ -107,6 +107,8 @@
         .loader { width: 52px; height: 52px; border: 4px solid rgba(255,255,255,.3); border-top-color: white; border-radius: 50%; margin: 0 auto 16px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading-subtext { font-size: 13px; opacity: .8; margin-top: 6px; }
+        .btn-stop-scan { margin-top: 16px; padding: 10px 28px; background: rgba(239,68,68,.15); color: #ef4444; border: 2px solid rgba(239,68,68,.4); border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; }
+        .btn-stop-scan:hover { background: rgba(239,68,68,.25); }
 
         /* Results */
         .results-section { animation: slideUp .4s ease; }
@@ -316,6 +318,7 @@
             <div class="loader"></div>
             <p>Scanning API endpoint...</p>
             <p class="loading-subtext">Running security tests</p>
+            <button class="btn-stop-scan" id="stopScanBtn" onclick="cancelScan()">Stop Scan</button>
         </div>
 
         <section id="resultsSection" class="results-section" style="display:none;">
